@@ -24,6 +24,6 @@ export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 
 --data_path即annotation (scannet+scannetpp)： [evaluation_samples.json](evaluation_samples.json) 
 
---image_root即场景图片所在的路径（已上传到huggingface的私有仓库）：JonnyYu828/Streaming3D-Bench
+--image_root即场景图片所在的路径（已上传到huggingface的私有仓库）：JonnyYu828/Stream3D-Bench
 
 --output_path：自定义输出结果的json路径，包含 问题的提问时间(question_time)、模型预测的回答时间(prediction_answer_time)、GT回答时间(gt_answer_time)、模型输出的答案(prediction)、GT答案的信息(ground_truth)
