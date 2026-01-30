@@ -18,6 +18,8 @@ export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 
 推理的脚本：[test_kv-evaluate-full_attn_mask.sh](src/qwen_vl/eval/test_kv-evaluate-full_attn_mask.sh) 
 
+运行脚本：bash src/qwen_vl/eval/test_kv-evaluate-full_attn_mask.sh
+
 --model_path即模型所在路径（已上传到huggingface的私有仓库，8B版本）：JonnyYu828/Stream3D-VLM
 
 --data_path即annotation (scannet+scannetpp)： [evaluation_samples.json](evaluation_samples.json) 
