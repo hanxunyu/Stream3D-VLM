@@ -4,11 +4,12 @@ conda create -n stream3d-llm python=3.10 -y
 
 conda activate stream3d-llm
 
+cd xxx/Stream3D-VLM
+
 pip install -r requirements.txt
 
 pip install flash-attn==2.7.4.post1 --no-build-isolation
 
-cd xxx/Stream3D-VLM
 
 export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 
