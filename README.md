@@ -1,6 +1,10 @@
-<p align="center">
-<h1 align="center"><img src="assets/logo.png" width="28"><strong>Stream3D-VLM: Online 3D Spatial Understanding
-with Incremental Geometry Priors</strong></h1>
+<h1 align="center" style="display: flex; align-items: flex-start; justify-content: center; gap: 12px;">
+  <img src="assets/logo.png" width="40" style="margin-top: 4px;">
+  <strong>
+    Stream3D-VLM: Online 3D Spatial Understanding<br>
+    with Incremental Geometry Priors
+  </strong>
+</h1>
 
 <p align="center">
     <a href="https://hanxunyu.github.io/" target="_blank">Hanxun Yu<sup>1,2*</sup></a>,
