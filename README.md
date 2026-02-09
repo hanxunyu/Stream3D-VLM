@@ -1,5 +1,5 @@
 <p align="center">
-<h1 align="center"><img src="images/logo.png" width="28"><strong>Stream3D-VLM: Online 3D Spatial Understanding
+<h1 align="center"><img src="assets/logo.png" width="28"><strong>Stream3D-VLM: Online 3D Spatial Understanding
 with Incremental Geometry Priors</strong></h1>
 
 <p align="center">
