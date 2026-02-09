@@ -1,5 +1,4 @@
 <h1 align="center" style="display: flex; align-items: flex-start; justify-content: center; gap: 12px;">
-  <img src="assets/logo.png" width="40" style="margin-top: 4px;">
   <strong>
     Stream3D-VLM: Online 3D Spatial Understanding<br>
     with Incremental Geometry Priors
