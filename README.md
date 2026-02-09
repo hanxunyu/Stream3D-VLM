@@ -62,6 +62,8 @@ export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 <img src="assets/data_generation.png" width="99%" alt="data_generation">
 </div>
 
+**Illustration of our data generation pipeline.** Guided by a comprehensive task taxonomy spanning five cognitive competencies and three temporal interaction modes, the pipeline leverages detailed metadata from RGB-D video streams and a hybrid generation strategy to construct a large-scale spatio-temporal 3D QA dataset and the Stream3D-Bench for evaluating online 3D spatial understanding.
+
 We provide the training datasets and **Stream3D-Bench** [yuxinhk/N3D-VLM](https://huggingface.co/yuxinhk/N3D-VLM) in Hugging Face 🤗. 
 
 ## 📦️ Pre-trained models
@@ -70,7 +72,7 @@ We provide the pre-trained models [yuxinhk/N3D-VLM](https://huggingface.co/yuxin
 ## 🚀 Training
 
 ## 🤖 Inference 
-We provide three examples for inference of N3D-VLM. You could check the source files in `data` directory, where `*.jpg` are the source images and `*.npz` are the monocular point clouds obtained by using [MoGe2](https://github.com/microsoft/moge). 
+We provide three examples for the inference of N3D-VLM. You could check the source files in `data` directory, where `*.jpg` are the source images and `*.npz` are the monocular point clouds obtained by using [MoGe2](https://github.com/microsoft/moge). 
 ```
 # inference 
 python demo.py
