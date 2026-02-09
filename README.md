@@ -72,11 +72,15 @@ We provide the training datasets and **Stream3D-Bench** [XXXX](https://huggingfa
 We provide the pre-trained models [XXXX](https://huggingface.co/yuxinhk/N3D-VLM) in Hugging Face 🤗. 
 
 ## 🚀 Training
+```
+# train 
+python train.py
+```
 
 ## 🤖 Inference 
 ```
 # inference 
-python demo.py
+python inference.py
 ```
 
 ### Demo 1-Forward Response (Monitoring)
