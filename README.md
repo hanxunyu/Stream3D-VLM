@@ -66,7 +66,7 @@ export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 
 **Illustration of our data generation pipeline.** Guided by a comprehensive task taxonomy spanning five cognitive competencies and three temporal interaction modes, the pipeline leverages detailed metadata from RGB-D video streams and a hybrid generation strategy to construct a large-scale spatio-temporal 3D QA dataset and the Stream3D-Bench for evaluating online 3D spatial understanding.
 
-We provide the training datasets and **Stream3D-Bench** [XXXX](https://huggingface.co/yuxinhk/N3D-VLM) in Hugging Face 🤗. 
+We provide the training dataset and **Stream3D-Bench** [XXXX](https://huggingface.co/yuxinhk/N3D-VLM) in Hugging Face 🤗. 
 
 ## 📦️ Pre-trained models
 We provide the pre-trained models [XXXX](https://huggingface.co/yuxinhk/N3D-VLM) in Hugging Face 🤗. 
