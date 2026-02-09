@@ -57,7 +57,7 @@ pip install -r requirements.txt
 pip install flash-attn==2.7.4.post1 --no-build-isolation
 export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 ```
-## Datasets and Benchmarks
+## 📊 Datasets and Benchmarks
 <div align="left">
 <img src="assets/data_generation.png" width="99%" alt="data_generation">
 </div>
@@ -113,7 +113,7 @@ https://github.com/user-attachments/assets/091e1687-7e35-42f7-83c9-a53a378ccda3
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
 
-## Citation
+## 🖊️ Citation
 
 ```BibTeX
 @article{wang2025n3d,
