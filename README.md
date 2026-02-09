@@ -27,12 +27,8 @@ with Incremental Geometry Priors</strong></h1>
         <img src='https://img.shields.io/badge/Hugging%20Face-Models-orange'>
     </a>
 </div>
-</p>
 
-
-
-
-https://github.com/user-attachments/assets/077b6a9c-d1b3-4ebe-a9f1-e652b654b7d1
+https://github.com/user-attachments/assets/a2788b03-6eb1-4e18-ad0a-904e6a408992
 
 
 ## 🔍 Overview
