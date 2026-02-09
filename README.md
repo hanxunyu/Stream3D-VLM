@@ -44,7 +44,7 @@ https://github.com/user-attachments/assets/a2788b03-6eb1-4e18-ad0a-904e6a408992
 
 ## 📰 News
 
-- **`2025/12/19`**: We released this repo with the pre-trained model and inference code.
+- **`2026/02/19`**: We released this repo with the pre-trained model and inference code.
 
 
 ## 🛠️ Installation
@@ -66,15 +66,14 @@ export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 
 **Illustration of our data generation pipeline.** Guided by a comprehensive task taxonomy spanning five cognitive competencies and three temporal interaction modes, the pipeline leverages detailed metadata from RGB-D video streams and a hybrid generation strategy to construct a large-scale spatio-temporal 3D QA dataset and the Stream3D-Bench for evaluating online 3D spatial understanding.
 
-We provide the training datasets and **Stream3D-Bench** [yuxinhk/N3D-VLM](https://huggingface.co/yuxinhk/N3D-VLM) in Hugging Face 🤗. 
+We provide the training datasets and **Stream3D-Bench** [XXXX](https://huggingface.co/yuxinhk/N3D-VLM) in Hugging Face 🤗. 
 
 ## 📦️ Pre-trained models
-We provide the pre-trained models [yuxinhk/N3D-VLM](https://huggingface.co/yuxinhk/N3D-VLM) in Hugging Face 🤗. 
+We provide the pre-trained models [XXXX](https://huggingface.co/yuxinhk/N3D-VLM) in Hugging Face 🤗. 
 
 ## 🚀 Training
 
 ## 🤖 Inference 
-We provide three examples for the inference of N3D-VLM. You could check the source files in `data` directory, where `*.jpg` are the source images and `*.npz` are the monocular point clouds obtained by using [MoGe2](https://github.com/microsoft/moge). 
 ```
 # inference 
 python demo.py
@@ -118,12 +117,7 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 ## 🖊️ Citation
 
 ```BibTeX
-@article{wang2025n3d,
-    title={N3D-VLM: Native 3D Grounding Enables Accurate Spatial Reasoning in Vision-Language Models},
-    author={Wang, Yuxin and Ke, Lei and Zhang, Boqiang and Qu, Tianyuan and Yu, Hanxun and Huang, Zhenpeng and Yu, Meng and Xu, Dan and Yu, Dong},
-    journal={arXiv preprint arXiv:2512.16561},
-    year={2025}
-}
+
 ```
 
 
