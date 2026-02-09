@@ -26,7 +26,7 @@
         <img src='https://img.shields.io/badge/Hugging%20Face-Dataset%20%26%20Benchmark-blue'>
     </a>
     <a href='' target="_blank">
-        <img src='https://img.shields.io/badge/Hugging%20Face-Models-orange'>
+        <img src='https://img.shields.io/badge/%F0%9F%93%A6%EF%B8%8F%20Hugging%20Face-Models-orange'>
     </a>
 </div>
 
