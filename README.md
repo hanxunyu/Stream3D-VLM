@@ -9,7 +9,7 @@ with Incremental Geometry Priors</strong></h1>
     <a href="https://www.kelei.site/" target="_blank">Lei Ke<sup>2</sup></a>,
     <a href="https://cyrilsterling.github.io/" target="_blank">Boqiang Zhang<sup>2</sup></a>,
     <a href="https://w-ted.github.io/" target="_blank">Yuxin Wang<sup>2,3</sup></a>,
-    <a href="https://person.zju.edu.cn/jkzhu" target="_blank">Jianke Zhu<sup>1&dagger;</sup></a>,
+    <a href="https://person.zju.edu.cn/jkzhu" target="_blank">Jianke Zhu<sup>1</sup></a>,
     <a href="https://dongyu888.github.io/" target="_blank">Dong Yu<sup>2</sup></a>
     <br>
     <sup>1</sup>ZJU,
@@ -34,7 +34,7 @@ https://github.com/user-attachments/assets/a2788b03-6eb1-4e18-ad0a-904e6a408992
 ## 🔍 Overview
 
 <div align="left">
-<img src="assets/pipeline.png" width="99%" alt="Inst3D-LLM">
+<img src="assets/pipeline.png" width="99%" alt="model">
 </div>
 
 **Stream3D-VLM** is an online 3D vision-language model that supports real-time spatial understanding and interaction directly from streaming video. By incrementally integrating geometry priors and employing geometry-adaptive token compression, our approach enables efficient and continuous 3D scene comprehension without requiring offline processing or complete scene observations.
@@ -48,14 +48,21 @@ https://github.com/user-attachments/assets/a2788b03-6eb1-4e18-ad0a-904e6a408992
 ## 🛠️ Installation
 
 ```
-git clone --recursive https://github.com/W-Ted/N3D-VLM.git
-cd N3D-VLM
+git clone https://github.com/hanxunyu/Stream3D-VLM.git
+cd Stream3D-VLM
 
-conda env create -n n3d_vlm python=3.11 -y
-conda activate n3d_vlm
-pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu124
+conda create -n stream3d-llm python=3.10 -y
+conda activate stream3d-llm
 pip install -r requirements.txt
+pip install flash-attn==2.7.4.post1 --no-build-isolation
+export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 ```
+## Datasets and Benchmarks
+<div align="left">
+<img src="assets/data_generation.png" width="99%" alt="data_generation">
+</div>
+
+We provide the training datasets and **Stream3D-Bench** [yuxinhk/N3D-VLM](https://huggingface.co/yuxinhk/N3D-VLM) in Hugging Face 🤗. 
 
 ## 📦️ Pre-trained models
 We provide the pre-trained models [yuxinhk/N3D-VLM](https://huggingface.co/yuxinhk/N3D-VLM) in Hugging Face 🤗. 
@@ -69,37 +76,34 @@ We provide three examples for inference of N3D-VLM. You could check the source f
 python demo.py
 ```
 
-### Demo 1
+### Demo 1-Forward Response (Monitoring)
 
 
-https://github.com/user-attachments/assets/e86306f2-152d-4337-a8d2-d165a26ce305
+
+https://github.com/user-attachments/assets/a3af0dab-6c39-48b9-a43d-41596e4ceb57
 
 
-### Demo 2
 
 
-https://github.com/user-attachments/assets/1bc0ee64-7a15-4592-941d-1037a26fb108
+
+### Demo 2-Realtime Perception (Observation)
 
 
-### Demo 3
 
 
-https://github.com/user-attachments/assets/ba7ece12-4288-411d-9964-c676b78c6d5c
+https://github.com/user-attachments/assets/04a945b7-3c8d-4305-bd9a-0e7ca5fac45c
 
 
-After running the code above, the inference results will be saved in the `outputs` directory, including generated answers in `*.json` format, and 3D grounding results in `*.rrd` format. 
-The rrd files can be visualized by using [Rerun](https://rerun.io):
-```
-rerun outputs/demo1.rrd
-```
 
-If you want to do the 3D Detection only, please check the example as below. 
-```
-# inference 
-python detection.py
-# visualization
-rerun outputs/test1.rrd
-```
+
+### Demo 3-Backward Tracing (Memory)
+
+
+
+
+https://github.com/user-attachments/assets/091e1687-7e35-42f7-83c9-a53a378ccda3
+
+
 
 
 ## License
