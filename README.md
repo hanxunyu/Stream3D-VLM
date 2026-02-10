@@ -20,10 +20,10 @@
 </p>
 
 <div align="center">
-    <a href='https://arxiv.org/abs/2512.16561' target="_blank"><img src='https://img.shields.io/badge/arXiv-2512.16561-b31b1b.svg'></a>  
-    <a href='' target="_blank"><img src='https://img.shields.io/badge/Project-Home%20Page-Green'></a>  
+    <a href='https://arxiv.org/abs/2512.16561' target="_blank"><img src='https://img.shields.io/badge/arXiv-XXXX-b31b1b?logo=arxiv&logoColor=red'></a>  
+    <a href='' target="_blank"><img src='https://img.shields.io/badge/Project-Home%20Page-Green?logo=safari&logoColor=white'></a>  
     <a href='' target="_blank">
-        <img src='https://img.shields.io/badge/Hugging%20Face-Dataset%20%26%20Benchmark-blue'>
+        <img src='https://img.shields.io/badge/Hugging%20Face-Dataset%20and%20Benchmark-blue?logo=huggingface&logoColor=yellow'>
     </a>
     <a href='' target="_blank">
         <img src='https://img.shields.io/badge/%F0%9F%93%A6%EF%B8%8F%20Hugging%20Face-Models-orange'>
