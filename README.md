@@ -59,7 +59,7 @@ pip install -r requirements.txt
 pip install flash-attn==2.7.4.post1 --no-build-isolation
 export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 ```
-## 📊 Datasets and Benchmarks
+## 📊 Dataset and Benchmark
 <div align="left">
 <img src="assets/data_generation.png" width="99%" alt="data_generation">
 </div>
