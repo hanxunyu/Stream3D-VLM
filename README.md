@@ -20,10 +20,10 @@
 </p>
 
 <div align="center">
-    <a href='https://arxiv.org/abs/2512.16561' target="_blank"><img src='https://img.shields.io/badge/arXiv-2512.16561-b31b1b.svg'></a>  
-    <a href='' target="_blank"><img src='https://img.shields.io/badge/Project-Home%20Page-Green'></a>  
+    <a href='https://arxiv.org/abs/2512.16561' target="_blank"><img src='https://img.shields.io/badge/arXiv-XXXX-b31b1b?logo=arxiv&logoColor=red'></a>  
+    <a href='' target="_blank"><img src='https://img.shields.io/badge/Project-Home%20Page-Green?logo=safari&logoColor=white'></a>  
     <a href='' target="_blank">
-        <img src='https://img.shields.io/badge/Hugging%20Face-Dataset%20%26%20Benchmark-blue'>
+        <img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Dataset%20and%20Benchmark-blue'>
     </a>
     <a href='' target="_blank">
         <img src='https://img.shields.io/badge/%F0%9F%93%A6%EF%B8%8F%20Hugging%20Face-Models-orange'>
@@ -59,7 +59,7 @@ pip install -r requirements.txt
 pip install flash-attn==2.7.4.post1 --no-build-isolation
 export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 ```
-## 📊 Datasets and Benchmarks
+## 📊 Dataset and Benchmark
 <div align="left">
 <img src="assets/data_generation.png" width="99%" alt="data_generation">
 </div>
@@ -113,7 +113,7 @@ https://github.com/user-attachments/assets/091e1687-7e35-42f7-83c9-a53a378ccda3
 
 
 
-## 📄 License
+## 🎫 License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE.txt) file for details.
 
