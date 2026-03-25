@@ -44,7 +44,10 @@ https://github.com/user-attachments/assets/a2788b03-6eb1-4e18-ad0a-904e6a408992
 
 ## 📰 News
 
-- **`2026/02/19`**: We released this repo with the pre-trained model and inference code.
+- [Coming!] 📝 We will release our training code and training data.
+- [2026-03-27] 🔥 We release [Stream3D-Bench](https://huggingface.co/yuxinhk/N3D-VLM) in Hugging Face 🤗.
+- [2026-03-27] 🔥 We release the inference code and the [checkpoint](https://huggingface.co/yuxinhk/N3D-VLM) of Stream3D-VLM.
+- [2026-03-27] 🔥 We release the [paper](https://arxiv.org/abs/2511.21688) of Stream3D-VLM.
 
 
 ## 🛠️ Installation
@@ -78,6 +81,7 @@ python train.py
 ``` -->
 
 ## 🤖 Inference Examples 
+Try our example inference script. 
 ```
 # inference 
 bash src/qwen_vl/eval/model_inference.sh
@@ -121,5 +125,9 @@ https://github.com/user-attachments/assets/091e1687-7e35-42f7-83c9-a53a378ccda3
 
 ```
 
+## 👏 Acknowledgements
+- [VG-LLM](https://github.com/ByteDance-Seed/Bagel): Our codebase is built upon VG-LLM.
+- [StreamVGGT](https://github.com/facebookresearch/vggt): We thank StreamVGGT for their efforts in streaming 3D reconstruction.
+- [VLM-3R](https://github.com/yyfz/Pi3): We thank VLM-3R for their efforts in 3D spatial understanding.
 
 
