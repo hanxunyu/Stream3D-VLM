@@ -46,9 +46,9 @@ https://github.com/user-attachments/assets/a2788b03-6eb1-4e18-ad0a-904e6a408992
 
 - [Coming!] 📝 We will release our training code and training data.
 - [Coming!] 📝 We will release our training data preprocessing code.
-- [2026-03-27] 🔥 We release [Stream3D-Bench](https://huggingface.co/yuxinhk/N3D-VLM) in Hugging Face 🤗.
-- [2026-03-27] 🔥 We release the inference code and the [checkpoint](https://huggingface.co/yuxinhk/N3D-VLM) of Stream3D-VLM.
-- [2026-03-27] 🔥 We release the [paper](https://arxiv.org/abs/2511.21688) of Stream3D-VLM.
+- [2026-03-27] 🔥 We release [Stream3D-Bench](https://huggingface.co/datasets/JonnyYu828/Stream3D-Bench) in Hugging Face 🤗.
+- [2026-03-27] 🔥 We release the inference code and the [checkpoint](https://huggingface.co/JonnyYu828/Stream3D-VLM) of Stream3D-VLM.
+- [2026-03-27] 🔥 We release the [paper](xxxxx) of Stream3D-VLM.
 
 
 ## 🛠️ Installation
@@ -72,8 +72,8 @@ export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 
 <!-- We provide **the training dataset** and **Stream3D-Bench** ([XXXX](https://huggingface.co/yuxinhk/N3D-VLM)) in Hugging Face 🤗.  -->
 
-## 📦️ Pre-trained models
-We provide the pre-trained models ([XXXX](https://huggingface.co/yuxinhk/N3D-VLM)) in Hugging Face 🤗. 
+## 📦️ Pretrained models
+We provide the pretrained models [🤗Stream3D-VLM-4B](https://huggingface.co/JonnyYu828/Stream3D-VLM) and [🤗Stream3D-VLM-8B](https://huggingface.co/JonnyYu828/Stream3D-VLM) in Hugging Face. 
 
 <!-- ## 🚀 Training
 ```
@@ -127,8 +127,8 @@ https://github.com/user-attachments/assets/091e1687-7e35-42f7-83c9-a53a378ccda3
 ```
 
 ## 👏 Acknowledgements
-- [VG-LLM](https://github.com/ByteDance-Seed/Bagel): Our codebase is built upon VG-LLM.
-- [StreamVGGT](https://github.com/facebookresearch/vggt): We thank StreamVGGT for their efforts in streaming 3D reconstruction.
-- [VLM-3R](https://github.com/yyfz/Pi3): We thank VLM-3R for their efforts in 3D spatial understanding.
+- [VG-LLM](https://github.com/LaVi-Lab/VG-LLM): Our codebase is built upon VG-LLM.
+- [StreamVGGT](https://github.com/wzzheng/streamvggt): We thank StreamVGGT for their efforts in streaming 3D reconstruction.
+- [VLM-3R](https://github.com/VITA-Group/VLM-3R): We thank VLM-3R for their efforts in 3D spatial understanding.
 
 
