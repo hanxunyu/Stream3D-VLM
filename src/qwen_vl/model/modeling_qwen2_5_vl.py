@@ -569,11 +569,6 @@ class Qwen2_5_VisionTransformerPretrainedModel(Qwen2_5_VLPreTrainedModel):
 
         # ===== 新增：在 Vision Encoder 出口打印 =====
         if True:  # 可以改为 self.training 只在训练时打印
-            # print("\n" + "="*70)
-            # print("VISION ENCODER OUTPUT")
-            # print("="*70)
-            # print(f"Output hidden_states shape: {hidden_states.shape}")
-            # print(f"Output features per image:")
             
             if grid_thw is not None:
                 start_idx = 0
@@ -588,8 +583,6 @@ class Qwen2_5_VisionTransformerPretrainedModel(Qwen2_5_VLPreTrainedModel):
                     # print(f"  Image {idx}: {num_output_tokens} tokens (indices {start_idx}-{end_idx})")
                     start_idx = end_idx
                 
-                # print(f"Total output tokens: {hidden_states.shape[0]}")
-            # print("="*70 + "\n")
 
         return hidden_states
 
@@ -612,15 +605,6 @@ class Qwen2_5_VisionTransformerPretrainedModel(Qwen2_5_VLPreTrainedModel):
         # Check trainable status of merger module
         is_merger_trainable = any(param.requires_grad for param in self.merger.parameters())
 
-        # Print results
-        # print("Vision Module - Attention Blocks:")
-        # print(
-        #     f"Trainable Block Indices: {trainable_blocks if trainable_blocks else 'None'}"
-        # )
-        # print(
-        #     f"Non-Trainable Block Indices: {non_trainable_blocks if non_trainable_blocks else 'None'}"
-        # )
-        # print(f"Merger Module Trainable: {is_merger_trainable}")
 
 
 class Qwen2_5_VLRotaryEmbedding(nn.Module):
@@ -1716,26 +1700,6 @@ class Qwen2_5_VLForConditionalGenerationWithVGGT(Qwen2_5_VLPreTrainedModel, Gene
             # (n_image, 14*18, hidden_size)
             # print(f"the shape of image embeddings after fusion: {image_embeds.shape}")
             
-            # # ===== 可学习的降采样 =====
-            # n_image, seq_len, hidden_size = image_embeds.shape
-            
-            # if seq_len % 2 == 0:
-            #     # Reshape成相邻token对
-            #     image_embeds = image_embeds.view(n_image, seq_len // 2, 2, hidden_size)
-            #     # Concat相邻tokens
-            #     image_embeds = image_embeds.reshape(n_image, seq_len // 2, 2 * hidden_size)
-            #     # 可学习的降维
-            #     image_embeds = self.visual_downsample(image_embeds)
-            #     print(f"the shape after learnable downsampling: {image_embeds.shape}")
-            # else:
-            #     # 处理奇数情况
-            #     zero_token = torch.zeros(n_image, 1, hidden_size, dtype=image_embeds.dtype, device=image_embeds.device)
-            #     image_embeds = torch.cat([image_embeds, zero_token], dim=1)
-            #     new_seq_len = image_embeds.shape[1]
-            #     image_embeds = image_embeds.view(n_image, new_seq_len // 2, 2, hidden_size)
-            #     image_embeds = image_embeds.reshape(n_image, new_seq_len // 2, 2 * hidden_size)
-            #     image_embeds = self.visual_downsample(image_embeds)
-            #     print(f"the shape after learnable downsampling (with padding): {image_embeds.shape}")
 
             image_embeds = image_embeds.view(-1, image_embeds.shape[-1])
             # print(f"the shape of image embeddings after fusion and downsampling: {image_embeds.shape}")
@@ -2147,16 +2111,10 @@ class Qwen2_5_VLForConditionalGenerationWithVGGT(Qwen2_5_VLPreTrainedModel, Gene
             # 3. "\n"之后生成language response
             
             if vision_end_token_id is not None and frame_interval_token_id is not None and frame_end_token_id is not None:
-                # if self.training:
-                    # print("\n" + "="*60)
-                    # print("Training Mode: Calculating Streaming Decision Loss")
-                    # print("="*60)
-                
+               
                 # 1. 找到所有 vision_end_token 的位置
                 vision_end_positions = (original_input_ids == vision_end_token_id).nonzero(as_tuple=False).squeeze(-1)
                 
-                # if self.training and len(vision_end_positions) > 0:
-                    # print(f"Found {len(vision_end_positions)} vision_end tokens")
                 
                 # 2. 识别哪些位置是帧决策位置
                 # 帧决策位置的特征: vision_end_token后面紧跟着","或"\n"
@@ -2176,10 +2134,7 @@ class Qwen2_5_VLForConditionalGenerationWithVGGT(Qwen2_5_VLPreTrainedModel, Gene
                             if self.training:
                                 token_str = "," if next_token == frame_interval_token_id else "\\n"
                                 decision_type = "CONTINUE" if next_token == frame_interval_token_id else "STOP"
-                                # print(f"  Position {pos_item}: predict '{token_str}' ({decision_type})")
                         else:
-                            # if self.training:
-                            #     print(f"  Position {pos_item}: No frame decision (next token is {next_token})")
                             pass
                 
                 # 3. LLM loss mask: 所有非帧决策的有效位置
@@ -2211,20 +2166,11 @@ class Qwen2_5_VLForConditionalGenerationWithVGGT(Qwen2_5_VLPreTrainedModel, Gene
                     num_continue = (shift_labels[stream_loss_mask] == frame_interval_token_id).sum().item()
                     num_stop = (shift_labels[stream_loss_mask] == frame_end_token_id).sum().item()
                     
-                    # print(f"\nLoss Breakdown:")
-                    # print(f"  Total frame decision positions: {len(frame_decision_positions)}")
-                    # print(f"    - CONTINUE (,) positions: {num_continue}")
-                    # print(f"    - STOP (\\n) positions: {num_stop}")
-                    # print(f"  Stream loss (weight={stream_loss_weight}): {stream_loss.item():.4f}")
-                    # print(f"  LLM loss positions: {llm_loss_mask.sum().item()}")
-                    # print(f"  LLM loss (weight={llm_loss_weight}): {llm_loss.item():.4f}")
-                    # print(f"  Total loss: {loss.item():.4f}")
-                    # print("="*60 + "\n")
+                    
                     
             else:
                 # 如果没有配置帧决策token，使用标准loss
-                # if self.training:
-                #     print("Warning: Frame decision tokens not configured, using standard loss")
+                
                 loss_fct = CrossEntropyLoss()
                 shift_labels = shift_labels.to(shift_logits.device)
                 loss = loss_fct(shift_logits, shift_labels)

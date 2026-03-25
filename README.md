@@ -66,21 +66,21 @@ export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 
 **Illustration of our data generation pipeline.** Guided by a comprehensive task taxonomy spanning five cognitive competencies and three temporal interaction modes, the pipeline leverages detailed metadata from RGB-D video streams and a hybrid generation strategy to construct a large-scale spatio-temporal 3D QA dataset and the Stream3D-Bench for evaluating online 3D spatial understanding.
 
-We provide **the training dataset** and **Stream3D-Bench** ([XXXX](https://huggingface.co/yuxinhk/N3D-VLM)) in Hugging Face 🤗. 
+<!-- We provide **the training dataset** and **Stream3D-Bench** ([XXXX](https://huggingface.co/yuxinhk/N3D-VLM)) in Hugging Face 🤗.  -->
 
 ## 📦️ Pre-trained models
 We provide the pre-trained models ([XXXX](https://huggingface.co/yuxinhk/N3D-VLM)) in Hugging Face 🤗. 
 
-## 🚀 Training
+<!-- ## 🚀 Training
 ```
 # train 
 python train.py
-```
+``` -->
 
-## 🤖 Inference 
+## 🤖 Inference Examples 
 ```
 # inference 
-python inference.py
+bash src/qwen_vl/eval/model_inference.sh
 ```
 
 ### Demo 1-Forward Response (Monitoring)
@@ -113,9 +113,6 @@ https://github.com/user-attachments/assets/091e1687-7e35-42f7-83c9-a53a378ccda3
 
 
 
-## 🎫 License
-
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE.txt) file for details.
 
 
 ## 🖊️ Citation

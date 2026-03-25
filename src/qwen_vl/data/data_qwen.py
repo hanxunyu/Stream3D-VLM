@@ -120,11 +120,6 @@ def preprocess_qwen_2_visual(
                     
                     content = "".join(new_parts)
                     
-                    # 调试：打印处理后的 content
-                    # if local_rank == 0:
-                    #     print(f"\n[Data Processing Debug]")
-                    #     print(f"  Original: {conv.get('value', conv.get('content'))[:200]}...")
-                    #     print(f"  Processed: {content[:200]}...")
 
             # 编码整个 content
             conv = [{"role": role, "content": content}]
