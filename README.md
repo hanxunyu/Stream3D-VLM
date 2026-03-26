@@ -47,7 +47,7 @@ https://github.com/user-attachments/assets/a2788b03-6eb1-4e18-ad0a-904e6a408992
 - [Coming!] 📝 We will release our training code and training data.
 - [Coming!] 📝 We will release our training data preprocessing code.
 - [2026-03-27] 🔥 We release [Stream3D-Bench](https://huggingface.co/datasets/JonnyYu828/Stream3D-Bench) in Hugging Face 🤗.
-- [2026-03-27] 🔥 We release the inference code and the [checkpoint](https://huggingface.co/JonnyYu828/Stream3D-VLM) of Stream3D-VLM.
+- [2026-03-27] 🔥 We release the inference code and the [checkpoints](https://huggingface.co/JonnyYu828/Stream3D-VLM) of Stream3D-VLM.
 - [2026-03-27] 🔥 We release the [paper](xxxxx) of Stream3D-VLM.
 
 
