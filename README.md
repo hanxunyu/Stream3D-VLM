@@ -120,15 +120,15 @@ https://github.com/user-attachments/assets/091e1687-7e35-42f7-83c9-a53a378ccda3
 
 
 
+## 👏 Acknowledgements
+We are grateful for the open-source contributions of other projects:
+- [StreamVGGT](https://github.com/wzzheng/streamvggt)
+- [VG-LLM](https://github.com/LaVi-Lab/VG-LLM)
+- [VLM-3R](https://github.com/VITA-Group/VLM-3R)
+
+
 ## 🖊️ Citation
 
 ```BibTeX
 
 ```
-
-## 👏 Acknowledgements
-- [VG-LLM](https://github.com/LaVi-Lab/VG-LLM): Our codebase is built upon VG-LLM.
-- [StreamVGGT](https://github.com/wzzheng/streamvggt): We thank StreamVGGT for their efforts in streaming 3D reconstruction.
-- [VLM-3R](https://github.com/VITA-Group/VLM-3R): We thank VLM-3R for their efforts in 3D spatial understanding.
-
-
