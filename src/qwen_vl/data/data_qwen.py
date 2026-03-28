@@ -95,17 +95,17 @@ def preprocess_qwen_2_visual(
             if role == "user":
                 visual_tag = f"<{visual_type}>"
                 if visual_tag in content:
-                    # ===== 修正后的处理逻辑 =====
-                    # 分割 content，但要注意最后一个 <image> 后面的处理
+                    # ===== Corrected processing logic =====
+                    # Split content, but handle the part after the last <image> carefully
                     
                     import re
-                    # 不要在正则中包含 "," 和 "\n"，手动处理
+                    # Do not include "," and "\n" in regex, handle them manually
                     parts = content.split(visual_tag)
                     
                     new_parts = []
                     for i, part in enumerate(parts):
-                        if i > 0:  # 除了第一个部分，前面都有 <image>
-                            # 添加 vision tokens
+                        if i > 0:  # All parts except the first are preceded by <image>
+                            # Add vision tokens
                             replacement = (
                                 "<|vision_start|>"
                                 + f"<|{visual_type}_pad|>" * grid_thw[visual_replicate_index]
@@ -114,32 +114,32 @@ def preprocess_qwen_2_visual(
                             new_parts.append(replacement)
                             visual_replicate_index += 1
                         
-                        # 添加这个部分的内容（可能包含 ",", "\n", 文本等）
-                        if part:  # 非空
+                        # Add the content of this part (may contain ",", "\n", text, etc.)
+                        if part:  # Non-empty
                             new_parts.append(part)
                     
                     content = "".join(new_parts)
                     
 
-            # 编码整个 content
+            # Encode the entire content
             conv = [{"role": role, "content": content}]
             encode_id = tokenizer.apply_chat_template(conv)
             input_id += encode_id
             
             if role in ["user", "system"]:
-                # ===== 关键修改: 处理 labels =====
-                # 获取特殊 token ids
+                # ===== Key modification: Handle labels =====
+                # Get special token ids
                 comma_token_id = tokenizer.encode(',', add_special_tokens=False)[0]
                 newline_token_id = tokenizer.encode('\n', add_special_tokens=False)[0]
                 vision_end_token_id = tokenizer.convert_tokens_to_ids("<|vision_end|>")
                 
-                # 默认 mask 掉所有 user 输入
+                # Mask all user inputs by default
                 target_mask = [IGNORE_INDEX] * len(encode_id)
                 
-                # 统计 vision_end 的数量
+                # Count the number of vision_end tokens
                 vision_end_count = 0
                 
-                # 遍历找到所有 <vision_end> 后面的 "," 或 "\n"
+                # Iterate to find all "," or "\n" following <vision_end>
                 for k in range(len(encode_id) - 1):
                     if encode_id[k] == vision_end_token_id:
                         vision_end_count += 1
@@ -147,9 +147,9 @@ def preprocess_qwen_2_visual(
                         # print(f"Vision End found. Next token ID: {next_token}, string: {tokenizer.decode([next_token])}")
                         # print(f"Expected: {comma_token_id} (,) or {newline_token_id} (\\n)")
                         
-                        # 如果下一个 token 是 "," 或 "\n"
+                        # If the next token is "," or "\n"
                         if next_token == comma_token_id or next_token == newline_token_id:
-                            # 保留这个位置的 label
+                            # Keep the label at this position
                             target_mask[k + 1] = next_token
                             
                             # Debug
@@ -167,7 +167,7 @@ def preprocess_qwen_2_visual(
                 
                 target += target_mask
             else:
-                # assistant 的回复全部保留
+                # Keep all assistant responses
                 target_mask = encode_id.copy()
                 target_mask[:3] = [IGNORE_INDEX] * 3
                 target += target_mask

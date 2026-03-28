@@ -567,14 +567,14 @@ class Qwen2_5_VisionTransformerPretrainedModel(Qwen2_5_VLPreTrainedModel):
         reverse_indices = torch.argsort(window_index)
         hidden_states = hidden_states[reverse_indices, :]
 
-        # ===== 新增：在 Vision Encoder 出口打印 =====
-        if True:  # 可以改为 self.training 只在训练时打印
+        # ===== Added: Print at Vision Encoder output =====
+        if True:  # Can be changed to self.training to only print during training
             
             if grid_thw is not None:
                 start_idx = 0
                 for idx, (t, h, w) in enumerate(grid_thw):
                     # print(f" Image {idx}: grid (T={t}, H={h}, W={w})")
-                    # 计算 merge 后的 token 数量
+                    # Calculate the number of tokens after merging
                     merged_h = h.item() // self.spatial_merge_size
                     merged_w = w.item() // self.spatial_merge_size
                     num_output_tokens = (t * merged_h * merged_w).item()
@@ -1652,7 +1652,7 @@ class Qwen2_5_VLForConditionalGenerationWithVGGT(Qwen2_5_VLPreTrainedModel, Gene
         )
         self.feature_fusion = FeatureFusionModule(fusion_config)
 
-        # 添加可学习的降采样模块用于average pooling
+        # Add learnable downsampling module for average pooling
         self.visual_downsample = nn.Sequential(
             nn.LayerNorm(config.hidden_size),
             nn.Linear(config.hidden_size * 2, config.hidden_size),
@@ -2085,7 +2085,7 @@ class Qwen2_5_VLForConditionalGenerationWithVGGT(Qwen2_5_VLPreTrainedModel, Gene
             shift_logits = logits[..., :-1, :].contiguous()
             shift_labels = labels[..., 1:].contiguous()
             
-            # 获取特殊token IDs
+            # Get special token IDs
             vision_end_token_id = self.config.vision_end_token_id  # <|vision_end|>
             frame_interval_token_id = getattr(self.config, 'frame_interval_token_id', None)  # ","
             frame_end_token_id = getattr(self.config, 'frame_end_token_id', None)  # "\n"
@@ -2094,30 +2094,30 @@ class Qwen2_5_VLForConditionalGenerationWithVGGT(Qwen2_5_VLPreTrainedModel, Gene
             shift_logits = shift_logits.view(-1, self.config.vocab_size)
             shift_labels = shift_labels.view(-1)
             
-            # 获取原始input_ids (未shift的)
+            # Get original input_ids (before shifting)
             original_input_ids = input_ids[:, :-1].contiguous().view(-1)
             
-            # ===== 修改后的损失计算策略 =====
-            # 训练数据格式示例:
+            # ===== Modified loss computation strategy =====
+            # Training data format example:
             # <img>,<img>,...,<query>,<img>,<img>,...,<img>\n
             #                         ^^^^^^^^^^^^^^^^^^^^^^^^
-            #                         query后面可能有多个images
+            #                         Multiple images may follow the query
             # 
-            # 目标: 让模型学习:
-            # 1. query前的每个<vision_end>后预测","
-            # 2. query后的images中:
-            #    - 除了最后一个image, 每个<vision_end>后预测","
-            #    - 最后一个image的<vision_end>后预测"\n" (停止)
-            # 3. "\n"之后生成language response
+            # Objective: Train the model to learn:
+            # 1. Predict "," after each <vision_end> before the query
+            # 2. For images after the query:
+            #    - Predict "," after <vision_end> for all images except the last one
+            #    - Predict "\n" (stop) after <vision_end> for the last image
+            # 3. Generate language response after "\n"
             
             if vision_end_token_id is not None and frame_interval_token_id is not None and frame_end_token_id is not None:
                
-                # 1. 找到所有 vision_end_token 的位置
+                # 1. Find all vision_end_token positions
                 vision_end_positions = (original_input_ids == vision_end_token_id).nonzero(as_tuple=False).squeeze(-1)
                 
                 
-                # 2. 识别哪些位置是帧决策位置
-                # 帧决策位置的特征: vision_end_token后面紧跟着","或"\n"
+                # 2. Identify frame decision positions
+                # Frame decision positions: vision_end_token immediately followed by "," or "\n"
                 frame_decision_positions = []
                 stream_loss_mask = torch.zeros_like(shift_labels, dtype=torch.bool)
                 
@@ -2126,7 +2126,7 @@ class Qwen2_5_VLForConditionalGenerationWithVGGT(Qwen2_5_VLPreTrainedModel, Gene
                     if pos_item < len(shift_labels):
                         next_token = shift_labels[pos_item]
                         
-                        # 如果下一个token是","或"\n", 这就是一个帧决策位置
+                        # If the next token is "," or "\n", this is a frame decision position
                         if next_token == frame_interval_token_id or next_token == frame_end_token_id:
                             frame_decision_positions.append(pos_item)
                             stream_loss_mask[pos_item] = True
@@ -2137,31 +2137,31 @@ class Qwen2_5_VLForConditionalGenerationWithVGGT(Qwen2_5_VLPreTrainedModel, Gene
                         else:
                             pass
                 
-                # 3. LLM loss mask: 所有非帧决策的有效位置
-                # 这包括:
-                # - 所有的文本tokens (query + response)
-                # - 但排除帧决策位置
+                # 3. LLM loss mask: all valid positions excluding frame decisions
+                # This includes:
+                # - All text tokens (query + response)
+                # - But excludes frame decision positions
                 llm_loss_mask = ~stream_loss_mask & (shift_labels != -100)
                 
-                # 4. 计算两种loss
+                # 4. Compute two types of losses
                 loss_fct = CrossEntropyLoss(reduction='none')
                 all_losses = loss_fct(shift_logits, shift_labels.to(shift_logits.device))
                 
-                # Stream loss (帧决策): 让模型学习何时停止输入frames
-                # 这个loss只计算在","和"\n"位置
+                # Stream loss (frame decision): train the model to learn when to stop inputting frames
+                # This loss is computed only at "," and "\n" positions
                 stream_loss = all_losses[stream_loss_mask].mean() if stream_loss_mask.any() else torch.tensor(0.0, device=shift_logits.device)
                 
-                # LLM loss (语言生成): 让模型学习生成描述
-                # 这个loss计算在所有非帧决策的位置
+                # LLM loss (language generation): train the model to generate descriptions
+                # This loss is computed at all non-frame-decision positions
                 llm_loss = all_losses[llm_loss_mask].mean() if llm_loss_mask.any() else torch.tensor(0.0, device=shift_logits.device)
                 
-                # 5. 组合loss
+                # 5. Combine losses
                 stream_loss_weight = getattr(self.config, 'stream_loss_weight', 1.0)
                 llm_loss_weight = getattr(self.config, 'llm_loss_weight', 1.0)
                 
                 loss = stream_loss_weight * stream_loss + llm_loss_weight * llm_loss
                 
-                # 6. 训练时打印详细信息
+                # 6. Print detailed info during training
                 if self.training:
                     num_continue = (shift_labels[stream_loss_mask] == frame_interval_token_id).sum().item()
                     num_stop = (shift_labels[stream_loss_mask] == frame_end_token_id).sum().item()
@@ -2169,7 +2169,7 @@ class Qwen2_5_VLForConditionalGenerationWithVGGT(Qwen2_5_VLPreTrainedModel, Gene
                     
                     
             else:
-                # 如果没有配置帧决策token，使用标准loss
+                # If frame decision tokens are not configured, use standard loss
                 
                 loss_fct = CrossEntropyLoss()
                 shift_labels = shift_labels.to(shift_logits.device)

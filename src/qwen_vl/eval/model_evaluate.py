@@ -65,7 +65,7 @@ class StreamingEvaluator:
         self.temperature = temperature
         self.use_gradient_checkpointing = use_gradient_checkpointing
         
-        # 设置设备
+        # Set up device
         if local_rank == -1:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
         else:
@@ -76,7 +76,7 @@ class StreamingEvaluator:
         print(f"Local rank: {local_rank}, World size: {world_size}")
         print(f"Gradient checkpointing: {use_gradient_checkpointing}")
         
-        # 加载模型到指定GPU
+        # Load model to the specified GPU
         self.model = Qwen2_5_VLForConditionalGenerationWithVGGT.from_pretrained(
             model_path,
             torch_dtype=torch.bfloat16,
@@ -84,16 +84,16 @@ class StreamingEvaluator:
             attn_implementation="flash_attention_2",
         )
         
-        # 启用 Gradient Checkpointing
+        # Enable Gradient Checkpointing
         if use_gradient_checkpointing:
             self.model.gradient_checkpointing_enable()
             print("Gradient checkpointing enabled (slower but memory-efficient)")
         
-        # 将模型移到当前GPU
+        # Move model to current GPU
         self.model = self.model.to(self.device)
         self.model.eval()
         
-        # 如果是分布式，用DDP包装
+        # Wrap with DDP if distributed
         if local_rank != -1:
             self.model = DDP(
                 self.model,
@@ -119,7 +119,7 @@ class StreamingEvaluator:
         self.frame_interval_token_id = self.tokenizer.encode(',', add_special_tokens=False)[0]
         self.frame_end_token_id = self.tokenizer.encode('\n', add_special_tokens=False)[0]
         
-        # 获取 chat template 相关的 token IDs
+        # Get chat template related token IDs
         self.im_end_token_id = self.tokenizer.convert_tokens_to_ids("<|im_end|>")
         self.im_start_token_id = self.tokenizer.convert_tokens_to_ids("<|im_start|>")
         self.assistant_token_ids = self.tokenizer.encode("assistant", add_special_tokens=False)
@@ -214,7 +214,7 @@ class StreamingEvaluator:
                 - timing_stats: dictionary containing timing information
         """
         
-        # 分割图像
+        # Split images
         images_before = all_images[:num_images_before_query]
         images_after = all_images[num_images_before_query:]
         
@@ -226,7 +226,7 @@ class StreamingEvaluator:
         first_image_after = images_after[0]
         remaining_images_after = images_after[1:]
 
-        # ===== Step 1: 构建初始 messages =====
+        # ===== Step 1: Build initial messages =====
         content = []
         if images_before:
             content = self._build_image_add_comma_content(images_before)
@@ -250,7 +250,7 @@ class StreamingEvaluator:
         )
         text = text[:-len("<|im_end|>")-1]
 
-        # ===== Step 2: 处理初始图像 =====
+        # ===== Step 2: Process initial images =====
         geometry_encoder_inputs = []
         image_inputs = []
         patch_size = self.processor.image_processor.patch_size
@@ -300,14 +300,14 @@ class StreamingEvaluator:
         
         self._print_memory_stats("After processor")
         
-        # ===== Step 3: 首次 forward =====
+        # ===== Step 3: First forward pass =====
         input_ids = inputs['input_ids']
         attention_mask = inputs['attention_mask']
         pixel_values = inputs.get('pixel_values', None)
         image_grid_thw = inputs.get('image_grid_thw', None)
         geometry_encoder_inputs_list = inputs.get('geometry_encoder_inputs', None)
         
-        # 记录当前序列长度（用于 cache_position）
+        # Record current sequence length (for cache_position)
         current_seq_len = input_ids.shape[1]
         
         past_key_values = None
@@ -318,7 +318,7 @@ class StreamingEvaluator:
             if self.is_main_process():
                 print("Starting first forward pass...")
             
-            # 首次 forward: 传入所有视觉信息
+            # First forward: pass in all visual information
             outputs = model_to_use(
                 input_ids=input_ids,
                 attention_mask=attention_mask,
@@ -350,9 +350,9 @@ class StreamingEvaluator:
                 print(f"  Generated token ID in the first generation: {next_token_id}")
                 print(f"  Decoded token: '{str(self.tokenizer.decode([next_token_id]))}'")
 
-        # ===== 辅助函数：生成最终回答 =====
+        # ===== Helper function: Generate final response =====
         def generate_final_response(past_key_values, current_seq_len) -> Tuple[str, Dict[str, float]]:
-            """生成最终的文本回答，并返回计时信息"""
+            """Generate the final text response and return timing information"""
             if self.is_main_process():
                 print(f"\n{'='*70}")
                 print(f"Generating final response")
@@ -360,11 +360,11 @@ class StreamingEvaluator:
             
             self._print_memory_stats("Before final generation")
 
-            # 记录答案生成开始时间
+            # Record answer generation start time
             answer_generation_start_time = time.perf_counter()
             ttft = None  # Time to first token
 
-            # 准备 chat prompt tokens
+            # Prepare chat prompt tokens
             chat_prompt_tokens = [
                 self.im_end_token_id,
                 self.newline_token_id,
@@ -377,9 +377,9 @@ class StreamingEvaluator:
                 device=self.device
             )
             
-            # Forward chat prompt 更新 KV cache
+            # Forward chat prompt to update KV cache
             with torch.no_grad(), torch.amp.autocast('cuda', dtype=torch.bfloat16):
-                # 计算 cache_position
+                # Calculate cache_position
                 cache_position = torch.arange(
                     current_seq_len, 
                     current_seq_len + chat_prompt_tensor.shape[1],
@@ -388,7 +388,7 @@ class StreamingEvaluator:
                 
                 outputs = model_to_use(
                     input_ids=chat_prompt_tensor,
-                    attention_mask=None,  # 使用 KV cache 时不需要 mask
+                    attention_mask=None,  # No mask needed when using KV cache
                     past_key_values=past_key_values,
                     cache_position=cache_position,
                     use_cache=True,
@@ -397,15 +397,15 @@ class StreamingEvaluator:
                 current_seq_len += chat_prompt_tensor.shape[1]
                 del outputs
 
-            # 手写循环解码
+            # Manual decoding loop
             generated_tokens: List[int] = []
             
-            # 从最后一个位置开始解码
+            # Start decoding from the last position
             for step in range(self.max_new_tokens):
-                # 获取上一步生成的 token（或第一步用 dummy token）
+                # Get token from previous step (or use dummy token for first step)
                 if step == 0:
-                    # 第一步：从 chat prompt 的 logits 已经可以开始
-                    # 重新 forward 最后一个 token 获取 logits
+                    # First step: logits from chat prompt are already available
+                    # Re-forward the last token to get logits
                     last_token = chat_prompt_tensor[:, -1:]
                     cache_position = torch.tensor([current_seq_len - 1], device=self.device)
                 else:
@@ -431,20 +431,20 @@ class StreamingEvaluator:
 
                 next_token_id = next_token.item()
                 
-                # 记录第一个 token 生成的时间 (TTFT)
+                # Record time of first token generation (TTFT)
                 if step == 0:
                     ttft = time.perf_counter() - answer_generation_start_time
                
                 generated_tokens.append(next_token_id)
                 current_seq_len += 1
 
-                # 停止条件
+                # Stop conditions
                 if next_token_id == self.tokenizer.eos_token_id:
                     break
                 if next_token_id == self.im_end_token_id:
                     break
 
-            # 记录答案生成结束时间
+            # Record answer generation end time
             answer_generation_end_time = time.perf_counter()
             answer_generation_latency = answer_generation_end_time - answer_generation_start_time
             
@@ -454,11 +454,11 @@ class StreamingEvaluator:
                 clean_up_tokenization_spaces=True
             ).strip()
             
-            # 计算 tokens per second
+            # Calculate tokens per second
             num_tokens = len(generated_tokens)
             tokens_per_second = num_tokens / answer_generation_latency if answer_generation_latency > 0 else 0
             
-            # 只保留关键指标
+            # Keep only key metrics
             timing_stats = {
                 'ttft': ttft if ttft is not None else 0.0,
                 'answer_generation_latency': answer_generation_latency,
@@ -475,10 +475,10 @@ class StreamingEvaluator:
             
             return generated_text, timing_stats
 
-        # ===== Step 4: 处理 Frame 0 的决策 =====
-        current_seq_len += 1  # 加上刚生成的 token
+        # ===== Step 4: Handle Frame 0 decision =====
+        current_seq_len += 1  # Add the just-generated token
 
-        # Forward 决策 token 更新 KV cache
+        # Forward decision token to update KV cache
         with torch.no_grad(), torch.amp.autocast('cuda', dtype=torch.bfloat16):
             cache_position = torch.tensor([current_seq_len - 1], device=self.device)
             outputs = model_to_use(
@@ -507,7 +507,7 @@ class StreamingEvaluator:
             generated_text, timing_stats = generate_final_response(past_key_values, current_seq_len)
             return 0, generated_text, timing_stats
     
-        # ===== Step 5: 逐帧处理剩余图像 =====
+        # ===== Step 5: Process remaining images frame by frame =====
         current_frame_index = 0
         timing_stats = None
         
@@ -519,7 +519,7 @@ class StreamingEvaluator:
             
             self._print_memory_stats(f"Before frame {frame_idx}")
             
-            # 预处理新图像
+            # Preprocess new image
             new_image_inputs = []
             new_geometry_encoder_inputs = []
             
@@ -535,7 +535,7 @@ class StreamingEvaluator:
             image_tensor = image_tensor[:, :height, :width]
             new_image_inputs.append(image_tensor)
             
-            # 处理新图像
+            # Process new image
             image_text = "<|vision_start|><|image_pad|><|vision_end|>"
             
             with torch.amp.autocast('cuda', dtype=torch.bfloat16):
@@ -554,14 +554,14 @@ class StreamingEvaluator:
             new_pixel_values = new_image_processor_inputs['pixel_values']
             new_image_grid_thw = new_image_processor_inputs['image_grid_thw']
 
-            # 新增：获取mask
+            # Added: get attention mask
             new_attention_mask = new_image_processor_inputs['attention_mask']
 
             new_geo_tensor = torch.stack(new_geometry_encoder_inputs).to(self.device)
             
             num_new_tokens = new_image_token_tensor.shape[1]
             
-            # Forward: 新图像帧（需要传入视觉特征，因为这是新图像）
+            # Forward: new image frame (need to pass visual features since this is a new image)
             with torch.no_grad(), torch.amp.autocast('cuda', dtype=torch.bfloat16):
                 cache_position = torch.arange(
                     current_seq_len, 
@@ -570,14 +570,14 @@ class StreamingEvaluator:
                 )
                 
                 past_len = past_key_values[0][0].shape[-2]
-                # 构造历史mask，全1
+                # Construct history mask, all ones
                 past_mask = torch.ones(
                     (new_attention_mask.shape[0], past_len), 
                     dtype=new_attention_mask.dtype, 
                     device=self.device
                 )
 
-                # 拼接成完整 mask
+                # Concatenate into full attention mask
                 full_attention_mask = torch.cat([past_mask, new_attention_mask], dim=1)
 
                 outputs = model_to_use(
@@ -613,9 +613,9 @@ class StreamingEvaluator:
                     print(f"  Decoded token: '{self.tokenizer.decode([next_token_id])}'")
 
             current_frame_index = frame_idx
-            current_seq_len += 1  # 加上决策 token
+            current_seq_len += 1  # Add the decision token
             
-            # Forward 决策 token
+            # Forward decision token
             with torch.no_grad(), torch.amp.autocast('cuda', dtype=torch.bfloat16):
                 cache_position = torch.tensor([current_seq_len - 1], device=self.device)
                 outputs = model_to_use(
@@ -628,7 +628,7 @@ class StreamingEvaluator:
                 past_key_values = outputs.past_key_values
                 del outputs
             
-            # 检查决策
+            # Check decision
             if next_token_id == self.frame_interval_token_id:
                 if self.is_main_process():
                     print(f"  Decision: CONTINUE (,)")
@@ -646,7 +646,7 @@ class StreamingEvaluator:
                 generated_text, timing_stats = generate_final_response(past_key_values, current_seq_len)
                 break
         
-        # 确保有 generated_text 和 timing_stats
+        # Ensure generated_text and timing_stats exist
         if 'generated_text' not in locals() or timing_stats is None:
             generated_text, timing_stats = generate_final_response(past_key_values, current_seq_len)
 
@@ -678,8 +678,8 @@ class StreamingEvaluator:
         
         total_samples = len(dataset)
         if self.local_rank != -1:
-            # 使用更均匀的分配方式
-            samples_per_rank = (total_samples + self.world_size - 1) // self.world_size  # 向上取整
+            # Use a more evenly distributed allocation
+            samples_per_rank = (total_samples + self.world_size - 1) // self.world_size  # Round up
             start_idx = self.local_rank * samples_per_rank
             end_idx = min(start_idx + samples_per_rank, total_samples)
             dataset = dataset[start_idx:end_idx]
@@ -712,7 +712,7 @@ class StreamingEvaluator:
                         ground_truth = conv.get('value', '')
                 
                 if not images or not conversation_value:
-                    # ===== 关键修复 2: 即使跳过也要添加占位结果 =====
+                    # ===== Key fix 2: Add placeholder result even when skipping =====
                     results.append({
                         'sample_id': sample_idx,
                         'skipped': True,
@@ -743,7 +743,7 @@ class StreamingEvaluator:
                     'last_frame_index_after_query': last_frame_idx,
                     'num_images_used_after_query': last_frame_idx + 1,
                     'total_images': len(images),
-                    # 计时信息
+                    # Timing information
                     'timing': {
                         'ttft_seconds': timing_stats['ttft'],
                         'ttft_ms': timing_stats['ttft'] * 1000,
@@ -759,7 +759,7 @@ class StreamingEvaluator:
                 print(f"\nError processing sample {sample_idx}: {str(e)}")
                 import traceback
                 traceback.print_exc()
-                # ===== 关键修复 3: 错误时也添加结果 =====
+                # ===== Key fix 3: Add result even on error =====
                 results.append({
                     'sample_id': sample_idx,
                     'skipped': True,
@@ -767,17 +767,17 @@ class StreamingEvaluator:
                 })
                 continue
         
-        # ===== 关键修复 4: 在 all_gather 前添加同步屏障 =====
+        # ===== Key fix 4: Add sync barrier before all_gather =====
         if self.local_rank != -1:
             print(f"Rank {self.local_rank}: Finished processing {len(results)} samples, waiting for sync...")
-            dist.barrier()  # 等待所有进程完成
+            dist.barrier()  # Wait for all processes to finish
             
             try:
-                # 设置更长的超时时间
+                # Set a longer timeout
                 all_results = [None] * self.world_size
                 dist.all_gather_object(all_results, results)
                 
-                # 合并结果并过滤掉 skipped 的
+                # Merge results and filter out skipped ones
                 results = []
                 for rank_results in all_results:
                     if rank_results:
@@ -788,11 +788,11 @@ class StreamingEvaluator:
                 print(f"Rank {self.local_rank}: Gathered {len(results)} valid results from all ranks")
             except Exception as e:
                 print(f"Rank {self.local_rank}: all_gather_object failed: {e}")
-                # 如果 gather 失败，只保存本地结果
+                # If gather fails, only save local results
                 if self.is_main_process():
                     results = [r for r in results if not r.get('skipped', False)]
         
-        # ===== 只在主进程保存结果 =====
+        # ===== Save results only on the main process =====
         if self.is_main_process():
             os.makedirs(os.path.dirname(output_path) or '.', exist_ok=True)
             with open(output_path, 'w') as f:
@@ -809,7 +809,7 @@ class StreamingEvaluator:
         frames_used = [r['num_images_used_after_query'] for r in results]
         frames_total = [r['num_images_after_query'] for r in results]
         
-        # 计时统计
+        # Timing statistics
         ttft_values = [r['timing']['ttft_ms'] for r in results if 'timing' in r]
         latency_values = [r['timing']['answer_generation_latency_ms'] for r in results if 'timing' in r]
         tokens_per_sec_values = [r['timing']['tokens_per_second'] for r in results if 'timing' in r]
@@ -863,18 +863,18 @@ def main():
     
     args = parser.parse_args()
     
-    # 初始化分布式
+    # Initialize distributed
     local_rank = args.local_rank
     if local_rank == -1:
         local_rank = int(os.environ.get("LOCAL_RANK", -1))
     
     world_size = 1
     if local_rank != -1:
-        # ===== 关键修复: 设置更长的超时时间 =====
+        # ===== Key fix: Set a longer timeout =====
         import datetime
         dist.init_process_group(
             backend="nccl",
-            timeout=datetime.timedelta(hours=2)  # 设置 2 小时超时
+            timeout=datetime.timedelta(hours=2)  # Set 2-hour timeout
         )
         world_size = dist.get_world_size()
         local_rank = dist.get_rank()

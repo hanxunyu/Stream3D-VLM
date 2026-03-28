@@ -1,5 +1,5 @@
-# 设置更长的 NCCL 超时时间
-export NCCL_TIMEOUT=7200  # 2 小时
+# Set a longer NCCL timeout
+export NCCL_TIMEOUT=7200  # 2 hours
 
 
 NPROC_PER_NODE=$(nvidia-smi --list-gpus | wc -l)  
