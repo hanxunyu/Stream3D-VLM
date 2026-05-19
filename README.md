@@ -116,21 +116,15 @@ bash scripts/train/train_stream3d-8b.sh
 
 ### Demo 1-Forward Response (Monitoring)
 
-<div align="left">
-<img src="assets/forward_scene0599_02_converted.gif" width="99%" alt="Demo 1 - Forward Response">
-</div>
+
 
 ### Demo 2-Realtime Perception (Observation)
 
-<div align="left">
-<img src="assets/realtime_scene0200_00_converted.gif" width="99%" alt="Demo 2 - Realtime Perception">
-</div>
+
 
 ### Demo 3-Backward Tracing (Memory)
 
-<!-- <div align="left">
-<img src="assets/backward_scene0426_00_converted.gif" width="99%" alt="Demo 3 - Backward Tracing">
-</div> -->
+
 
 
 
