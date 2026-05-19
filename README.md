@@ -1,39 +1,43 @@
-<h1 align="center" style="display: flex; align-items: flex-start; justify-content: center; gap: 12px;">
+<!-- <h1 align="center" style="display: flex; align-items: flex-start; justify-content: center; gap: 12px;">
   <strong>
     Stream3D-VLM: Online 3D Spatial Understanding<br>
     with Incremental Geometry Priors
   </strong>
+</h1> -->
+<h1 align="center">
+  <img src="assets/logo.png" height="48" alt="Stream3D-VLM Logo" align="absmiddle">
+  &nbsp;Stream3D-VLM: Online 3D Spatial Understanding with Incremental Geometry Priors
 </h1>
 
 <p align="center">
     <a href="https://hanxunyu.github.io/" target="_blank">Hanxun Yu<sup>1,2*</sup></a>,
-    <a href="https://github.com/Select-ing" target="_blank">Xuan Qu<sup>1,2*</sup></a>,
+    <a href="https://openreview.net/profile?id=%7EXuan_Qu1" target="_blank">Xuan Qu<sup>1,2*</sup></a>,
     <a href="https://www.kelei.site/" target="_blank">Lei Ke<sup>2</sup></a>,
     <a href="https://cyrilsterling.github.io/" target="_blank">Boqiang Zhang<sup>2</sup></a>,
     <a href="https://w-ted.github.io/" target="_blank">Yuxin Wang<sup>2,3</sup></a>,
-    <a href="https://person.zju.edu.cn/jkzhu" target="_blank">Jianke Zhu<sup>1</sup></a>,
+    <a href="https://person.zju.edu.cn/en/jkzhu" target="_blank">Jianke Zhu<sup>1,4</sup></a>,
     <a href="https://dongyu888.github.io/" target="_blank">Dong Yu<sup>2</sup></a>
     <br>
-    <sup>1</sup>ZJU,
+    <sup>1</sup>Zhejiang University,
     <sup>2</sup>Tencent AI Lab,
     <sup>3</sup>HKUST
+    <sup>4</sup>Shenzhen Loop Area Institute
 </p>
 
 <div align="center">
     <a href='https://arxiv.org/abs/2512.16561' target="_blank"><img src='https://img.shields.io/badge/arXiv-XXXX-b31b1b?logo=arxiv&logoColor=red'></a>  
     <a href='' target="_blank"><img src='https://img.shields.io/badge/Project-Home%20Page-Green?logo=safari&logoColor=white'></a>  
     <a href='' target="_blank">
-        <img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Dataset%20and%20Benchmark-blue'>
+        <img src='https://img.shields.io/badge/%F0%9F%93%A6%EF%B8%8F%20Hugging%20Face-Model-orange'>
     </a>
     <a href='' target="_blank">
-        <img src='https://img.shields.io/badge/%F0%9F%93%A6%EF%B8%8F%20Hugging%20Face-Models-orange'>
+        <img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Dataset%20and%20Benchmark-blue'>
     </a>
 </div>
 
 
 
 
-https://github.com/user-attachments/assets/66797dad-246b-47f6-be91-9f952fdd8b1a
 
 
 
@@ -44,15 +48,15 @@ https://github.com/user-attachments/assets/66797dad-246b-47f6-be91-9f952fdd8b1a
 <img src="assets/pipeline.png" width="99%" alt="model">
 </div>
 
-**Stream3D-VLM** is an online 3D vision-language model that supports real-time spatial understanding and interaction directly from streaming video. By incrementally integrating geometry priors and employing geometry-adaptive token compression, our approach enables efficient and continuous 3D scene comprehension without requiring offline processing or complete scene observations.
+**Stream3D-VLM** is an online 3D vision-language model that supports real-time spatial understanding and interaction directly from streaming video. By incrementally integrating geometry priors and employing geometry-adaptive voxel compression, our approach enables efficient and continuous 3D scene comprehension without requiring offline processing or complete scene observations.
 
 
 ## 📰 News
 
-- [Coming!] 📝 We will release our training code and training data.
 - [Coming!] 📝 We will release our training data preprocessing code.
-- [2026-03-27] 🔥 We release [Stream3D-Bench](https://huggingface.co/datasets/JonnyYu828/Stream3D-Bench) in Hugging Face 🤗.
-- [2026-03-27] 🔥 We release the inference code and the [checkpoints](https://huggingface.co/JonnyYu828/Stream3D-VLM) of Stream3D-VLM.
+- [2026-03-27] 🔥 We release [Stream3D-1M Dataset](https://huggingface.co/datasets/JonnyYu828/Stream3D-Bench) and [Stream3D-Bench](https://huggingface.co/datasets/JonnyYu828/Stream3D-Bench) in Hugging Face 🤗.
+- [2026-03-27] 🔥 We release the checkpoints of [Stream3D-VLM-4B](https://huggingface.co/JonnyYu828/Stream3D-VLM-4B) and [Stream3D-VLM-8B](https://huggingface.co/JonnyYu828/Stream3D-VLM-8B) in Hugging Face 🤗.
+- [2026-03-27] 🔥 We release the training and inference code.
 - [2026-03-27] 🔥 We release the [paper](xxxxx) of Stream3D-VLM.
 
 
@@ -75,10 +79,10 @@ export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 
 **Illustration of our data generation pipeline.** Guided by a comprehensive task taxonomy spanning five cognitive competencies and three temporal interaction modes, the pipeline leverages detailed metadata from RGB-D video streams and a hybrid generation strategy to construct a large-scale spatio-temporal 3D QA dataset and the Stream3D-Bench for evaluating online 3D spatial understanding.
 
-<!-- We provide **the training dataset** and **Stream3D-Bench** ([XXXX](https://huggingface.co/yuxinhk/N3D-VLM)) in Hugging Face 🤗.  -->
+- Due to licensing restrictions, we are unable to directly release the source images. Instead, we provide the full data curation pipeline for reproducibility. Please refer to [data_process.md](./data_process/data_process.md) for detailed categary-specific preparation instructions.
 
-## 📦️ Pretrained models
-We provide the pretrained models [🤗Stream3D-VLM-4B](https://huggingface.co/JonnyYu828/Stream3D-VLM) and [🤗Stream3D-VLM-8B](https://huggingface.co/JonnyYu828/Stream3D-VLM) in Hugging Face. 
+## 📦️ Pretrained Models
+We provide the pretrained models [Stream3D-VLM-4B](https://huggingface.co/JonnyYu828/Stream3D-VLM-4B) and [Stream3D-VLM-8B](https://huggingface.co/JonnyYu828/Stream3D-VLM-8B) in Hugging Face 🤗. 
 
 <!-- ## 🚀 Training
 ```
@@ -91,6 +95,20 @@ Try our example inference script.
 ```
 # inference 
 bash src/qwen_vl/eval/model_inference.sh
+```
+Specify `--data_path` as [Stream3D-Bench](https://huggingface.co/datasets/JonnyYu828/Stream3D-Bench) and `--image_root` as the directory containing the source datasets, then run the evaluation on Stream3D-Bench.
+```
+# 获得NA和MCA指标：
+
+# 获得OEA指标：
+
+```
+
+## 🚀 Training
+
+Specify the DATASETS, then run the following training script.
+```
+bash scripts/train/train_stream3d-8b.sh
 ```
 
 ### Demo 1-Forward Response (Monitoring)
