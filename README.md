@@ -20,23 +20,28 @@
     <br>
     <sup>1</sup>Zhejiang University,
     <sup>2</sup>Tencent AI Lab,
-    <sup>3</sup>HKUST
+    <sup>3</sup>HKUST,
     <sup>4</sup>Shenzhen Loop Area Institute
 </p>
 
 <div align="center">
-    <a href='https://arxiv.org/abs/2512.16561' target="_blank"><img src='https://img.shields.io/badge/arXiv-XXXX-b31b1b?logo=arxiv&logoColor=red'></a>  
-    <a href='' target="_blank"><img src='https://img.shields.io/badge/Project-Home%20Page-Green?logo=safari&logoColor=white'></a>  
-    <a href='' target="_blank">
+    <a href='xxxxx' target="_blank"><img src='https://img.shields.io/badge/arXiv-XXXX-b31b1b?logo=arxiv&logoColor=red'></a>  
+    <a href='https://stream3d-vlm.github.io/' target="_blank"><img src='https://img.shields.io/badge/Project-Home%20Page-Green?logo=safari&logoColor=white'></a>  
+    <a href='https://huggingface.co/JonnyYu828/Stream3D-VLM-8B' target="_blank">
         <img src='https://img.shields.io/badge/%F0%9F%93%A6%EF%B8%8F%20Hugging%20Face-Model-orange'>
     </a>
-    <a href='' target="_blank">
-        <img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Dataset%20and%20Benchmark-blue'>
-    </a>
+    <a href='https://huggingface.co/datasets/JonnyYu828/Stream3D-1M-Dataset' target="_blank">
+    <img src='https://img.shields.io/badge/%F0%9F%93%9A%20Hugging%20Face-Dataset-blue'>
+</a>
+<a href='https://huggingface.co/datasets/JonnyYu828/Stream3D-Bench' target="_blank">
+    <img src='https://img.shields.io/badge/%F0%9F%8F%86%20Hugging%20Face-Benchmark-blueviolet'>
+</a>
 </div>
 
 
-https://github.com/user-attachments/assets/22ac3186-b41c-4b37-8ea2-8649412876ad
+
+
+
 
 
 
@@ -52,7 +57,7 @@ https://github.com/user-attachments/assets/22ac3186-b41c-4b37-8ea2-8649412876ad
 ## 📰 News
 
 - [Coming!] 📝 We will release our training data preprocessing code.
-- [2026-03-27] 🔥 We release [Stream3D-1M Dataset](https://huggingface.co/datasets/JonnyYu828/Stream3D-Bench) and [Stream3D-Bench](https://huggingface.co/datasets/JonnyYu828/Stream3D-Bench) in Hugging Face 🤗.
+- [2026-03-27] 🔥 We release [Stream3D-1M Dataset](https://huggingface.co/datasets/JonnyYu828/Stream3D-1M-Dataset) and [Stream3D-Bench](https://huggingface.co/datasets/JonnyYu828/Stream3D-Bench) in Hugging Face 🤗.
 - [2026-03-27] 🔥 We release the checkpoints of [Stream3D-VLM-4B](https://huggingface.co/JonnyYu828/Stream3D-VLM-4B) and [Stream3D-VLM-8B](https://huggingface.co/JonnyYu828/Stream3D-VLM-8B) in Hugging Face 🤗.
 - [2026-03-27] 🔥 We release the training and inference code.
 - [2026-03-27] 🔥 We release the [paper](xxxxx) of Stream3D-VLM.
@@ -111,33 +116,21 @@ bash scripts/train/train_stream3d-8b.sh
 
 ### Demo 1-Forward Response (Monitoring)
 
-
-
-https://github.com/user-attachments/assets/a3af0dab-6c39-48b9-a43d-41596e4ceb57
-
-
-
-
+<div align="left">
+<img src="assets/forward_scene0599_02_converted.gif" width="99%" alt="Demo 1 - Forward Response">
+</div>
 
 ### Demo 2-Realtime Perception (Observation)
 
-
-
-
-https://github.com/user-attachments/assets/04a945b7-3c8d-4305-bd9a-0e7ca5fac45c
-
-
-
+<div align="left">
+<img src="assets/realtime_scene0200_00_converted.gif" width="99%" alt="Demo 2 - Realtime Perception">
+</div>
 
 ### Demo 3-Backward Tracing (Memory)
 
-
-
-
-https://github.com/user-attachments/assets/091e1687-7e35-42f7-83c9-a53a378ccda3
-
-
-
+<!-- <div align="left">
+<img src="assets/backward_scene0426_00_converted.gif" width="99%" alt="Demo 3 - Backward Tracing">
+</div> -->
 
 
 
