@@ -27,7 +27,7 @@
 <div align="center">
     <a href='xxxxx' target="_blank"><img src='https://img.shields.io/badge/arXiv-XXXX-b31b1b?logo=arxiv&logoColor=red'></a>  
     <a href='https://stream3d-vlm.github.io/' target="_blank"><img src='https://img.shields.io/badge/Project-Home%20Page-Green?logo=safari&logoColor=white'></a>  
-    <a href='https://huggingface.co/JonnyYu828/Stream3D-VLM-8B' target="_blank">
+    <a href='https://huggingface.co/JonnyYu828/Stream3D-VLM-4B' target="_blank">
         <img src='https://img.shields.io/badge/%F0%9F%93%A6%EF%B8%8F%20Hugging%20Face-Model-orange'>
     </a>
     <a href='https://huggingface.co/datasets/JonnyYu828/Stream3D-1M-Dataset' target="_blank">
@@ -58,7 +58,7 @@
 
 - [Coming!] 📝 We will release our training data preprocessing code.
 - [2026-03-27] 🔥 We release [Stream3D-1M Dataset](https://huggingface.co/datasets/JonnyYu828/Stream3D-1M-Dataset) and [Stream3D-Bench](https://huggingface.co/datasets/JonnyYu828/Stream3D-Bench) in Hugging Face 🤗.
-- [2026-03-27] 🔥 We release the checkpoints of [Stream3D-VLM-4B](https://huggingface.co/JonnyYu828/Stream3D-VLM-4B) and [Stream3D-VLM-8B](https://huggingface.co/JonnyYu828/Stream3D-VLM-8B) in Hugging Face 🤗.
+- [2026-03-27] 🔥 We release the checkpoint of [Stream3D-VLM-4B](https://huggingface.co/JonnyYu828/Stream3D-VLM-4B) in Hugging Face 🤗.
 - [2026-03-27] 🔥 We release the training and inference code.
 - [2026-03-27] 🔥 We release the [paper](xxxxx) of Stream3D-VLM.
 
@@ -85,7 +85,7 @@ export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 - Due to licensing restrictions, we are unable to directly release the source images. Instead, we provide the full data curation pipeline for reproducibility. Please refer to [data_process.md](./data_process/data_process.md) for detailed categary-specific preparation instructions.
 
 ## 📦️ Pretrained Models
-We provide the pretrained models [Stream3D-VLM-4B](https://huggingface.co/JonnyYu828/Stream3D-VLM-4B) and [Stream3D-VLM-8B](https://huggingface.co/JonnyYu828/Stream3D-VLM-8B) in Hugging Face 🤗. 
+We provide the pretrained model [Stream3D-VLM-4B](https://huggingface.co/JonnyYu828/Stream3D-VLM-4B) in Hugging Face 🤗. 
 
 <!-- ## 🚀 Training
 ```
