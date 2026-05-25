@@ -39,9 +39,7 @@
 </div>
 
 
-
-
-
+https://github.com/user-attachments/assets/41888813-b040-4305-9188-ceb010ad84d1
 
 
 
@@ -117,13 +115,18 @@ bash scripts/train/train_stream3d-8b.sh
 ### Demo 1-Forward Response (Monitoring)
 
 
+https://github.com/user-attachments/assets/c1f2083f-cc4a-4ef7-ab09-72edfa351f65
+
 
 ### Demo 2-Realtime Perception (Observation)
 
 
+https://github.com/user-attachments/assets/eceea976-8004-4db2-b977-7dee083e8aca
+
 
 ### Demo 3-Backward Tracing (Memory)
 
+https://github.com/user-attachments/assets/2b479d23-cfba-4e4e-a226-e2d94b024731
 
 
 
