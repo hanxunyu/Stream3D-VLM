@@ -19,7 +19,7 @@
     <a href="https://dongyu888.github.io/" target="_blank">Dong Yu<sup>2</sup></a>
     <br>
     <sup>1</sup>Zhejiang University,
-    <sup>2</sup>Tencent AI Lab,
+    <sup>2</sup>Tencent Hunyuan,
     <sup>3</sup>HKUST,
     <sup>4</sup>Shenzhen Loop Area Institute
 </p>
