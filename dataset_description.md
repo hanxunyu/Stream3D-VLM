@@ -209,11 +209,11 @@ Stream3D-Bench employs task-specific evaluation metrics:
 | Multiple-Choice | Exact Match | Checks if the predicted option matches the correct answer |
 | Open-Ended | LLM-as-a-Judge | Uses GPT-4o to assess answer correctness |
 
-Additionally, we introduce **Answer-Timing Accuracy (ATA)** to measure temporal response precision in streaming tasks:
+Additionally, we introduce a new metric **$\textit{Answer-Timing Accuracy}$ $(ATA)$** to measure temporal response precision in streaming tasks:
 
 $$S(t_{\text{pred}}) = \mathbb{1}(t_{\text{pred}} \geq t_{\text{gt}}) \cdot \exp\left(-\beta \cdot (t_{\text{pred}} - t_{\text{gt}})\right)$$
 
-where $t_{\text{pred}}$ is the predicted response time, $t_{\text{gt}}$ is the earliest answerable ground-truth timestamp, and $\beta = 0.5$ is the delay penalty factor. ATA is computed by averaging the timing score over all samples.
+where $t_{\text{pred}}$ is the predicted response time, $t_{\text{gt}}$ is the earliest answerable ground-truth timestamp, and $\beta = 0.5$ is the delay penalty factor. The $ATA$ metric is computed by averaging the timing score over all samples.
 
 ---
 
@@ -227,7 +227,7 @@ The dataset is constructed from the three widely used 3D datasets:
 | [ScanNet++](https://kaldir.vc.in.tum.de/scannetpp/) | `scannetpp` | High-fidelity indoor scans with dense annotations |
 | [ARKitScenes](https://github.com/apple/ARKitScenes) / [CA-1M](https://github.com/apple/ml-cubifyanything) | `ca1m` | Large-scale real-world indoor scenes captured with ARKit |
 
-### ❓ Why `ca1m` instead of `arkitscenes`?
+### ❓ Why `CA-1M` instead of `ARKitScenes`?
 
 [CA-1M (CubifyAnything-1M)](https://github.com/apple/ml-cubifyanything) shares the same underlying raw sensor captures (iPad Pro RGB-D videos) as ARKitScenes, but additionally provides ground-truth camera poses registered to FARO laser scans. We download from CA-1M to leverage these high-quality GT poses, which are essential for our Ego-Motion Estimation tasks. Therefore, while our paper refers to the data source as "ARKitScenes" (since the scenes originate from that collection), the file naming uses `ca1m` to reflect the actual download source and its superior pose annotations.
 
