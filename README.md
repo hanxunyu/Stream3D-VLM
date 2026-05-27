@@ -54,7 +54,6 @@ https://github.com/user-attachments/assets/41888813-b040-4305-9188-ceb010ad84d1
 
 ## 📰 News
 
-- [Coming!] 📝 We will release our training data preprocessing code.
 - [2026-03-27] 🔥 We release [Stream3D-1M Dataset](https://huggingface.co/datasets/JonnyYu828/Stream3D-1M-Dataset) and [Stream3D-Bench](https://huggingface.co/datasets/JonnyYu828/Stream3D-Bench) in Hugging Face 🤗.
 - [2026-03-27] 🔥 We release the checkpoint of [Stream3D-VLM-4B](https://huggingface.co/JonnyYu828/Stream3D-VLM-4B) in Hugging Face 🤗.
 - [2026-03-27] 🔥 We release the training and inference code.
@@ -84,12 +83,6 @@ export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 
 ## 📦️ Pretrained Models
 We provide the pretrained model [Stream3D-VLM-4B](https://huggingface.co/JonnyYu828/Stream3D-VLM-4B) in Hugging Face 🤗. 
-
-<!-- ## 🚀 Training
-```
-# train 
-python train.py
-``` -->
 
 ## 🤖 Inference Examples 
 Try our example inference script. 
