@@ -2,7 +2,6 @@ torch==2.5.1
 torchvision==0.20.1
 transformers==4.50.0
 deepspeed==0.16.4
-flash_attn==2.7.4.post1
 triton==3.1.0
 accelerate==1.4.0
 torchcodec==0.2
@@ -51,5 +50,4 @@ decord
 zss
 protobuf==3.20
 qwen_vl_utils
-open3d==0.19.0
 terminaltables
