@@ -168,13 +168,9 @@ def prepare_image_inputs(image, image_processor):
         # 392
 
     images = images[:,:, :height, :width]
-    # print(f"the shape of images in utils.py is {images.shape}")  # (1, 3, H, W)
     visual_processed = image_processor(images, return_tensors="pt", do_rescale=False)
     image_tensor = visual_processed["pixel_values"] # (bs=1, C=3, H, W) [1008, 1176]
-    # print(f"the shape of visual_processed['pixel_values'] in utils.py is {image_tensor.shape}")
     grid_thw = visual_processed["image_grid_thw"] # ((T, H, W)) shape: [1,3]
-    # print(f"the shape of visual_processed['image_grid_thw'] in utils.py is {grid_thw.shape}")
-    # print(f"the value of visual_processed['image_grid_thw'] in utils.py is {grid_thw}")
 
     return {
         "pixel_values": image_tensor,

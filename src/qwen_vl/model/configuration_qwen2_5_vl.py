@@ -211,7 +211,7 @@ class Qwen2_5_VLConfig(PretrainedConfig):
         attention_dropout=0.0,
         vision_config=None,
         rope_scaling=None,
-        # 新增：帧决策相关配置
+        # Frame-decision related configuration
         frame_interval_token_id=None,
         frame_end_token_id=None,
         stream_loss_weight=1.0,
@@ -246,7 +246,7 @@ class Qwen2_5_VLConfig(PretrainedConfig):
         self.attention_dropout = attention_dropout
         self.rope_scaling = rope_scaling
         
-        # 新增：帧决策配置
+        # Frame-decision configuration
         self.frame_interval_token_id = frame_interval_token_id
         self.frame_end_token_id = frame_end_token_id
         self.stream_loss_weight = stream_loss_weight

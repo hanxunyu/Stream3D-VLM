@@ -34,6 +34,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import CrossEntropyLoss
 
+# try:
+#     from cuml import KMeans as cuKMeans
+# except ImportError:
+#     raise ImportError(
+#     "cuML not installed. Please install with: "
+#     "conda install -c rapidsai -c nvidia -c conda-forge cuml"
+# )
 from transformers.activations import ACT2FN
 from transformers.cache_utils import Cache, DynamicCache, SlidingWindowCache, StaticCache
 from transformers.generation import GenerationMixin
@@ -561,28 +568,21 @@ class Qwen2_5_VisionTransformerPretrainedModel(Qwen2_5_VLPreTrainedModel):
                 )
             else:
                 hidden_states = blk(hidden_states, cu_seqlens=cu_seqlens_now, position_embeddings=position_embeddings)
-        # print(f"the shape of hidden_states before merger: {hidden_states.shape}")
+        
         hidden_states = self.merger(hidden_states)
-        # print(f"the shape of hidden_states after merger: {hidden_states.shape}")
         reverse_indices = torch.argsort(window_index)
         hidden_states = hidden_states[reverse_indices, :]
 
-        # ===== Added: Print at Vision Encoder output =====
-        if True:  # Can be changed to self.training to only print during training
-            
+        if True:
             if grid_thw is not None:
                 start_idx = 0
                 for idx, (t, h, w) in enumerate(grid_thw):
-                    # print(f" Image {idx}: grid (T={t}, H={h}, W={w})")
-                    # Calculate the number of tokens after merging
                     merged_h = h.item() // self.spatial_merge_size
                     merged_w = w.item() // self.spatial_merge_size
                     num_output_tokens = (t * merged_h * merged_w).item()
                     
                     end_idx = start_idx + num_output_tokens
-                    # print(f"  Image {idx}: {num_output_tokens} tokens (indices {start_idx}-{end_idx})")
                     start_idx = end_idx
-                
 
         return hidden_states
 
@@ -1614,7 +1614,6 @@ class Qwen2_5_VLForConditionalGenerationWithVGGT(Qwen2_5_VLPreTrainedModel, Gene
             freeze_encoder=getattr(config, "geometry_encoder_freeze", True),
             train_or_eval_mode=getattr(config, "geometry_encoder_train_or_eval_mode", "eval")
         )
-        print(f"here train_or_eval_mode: {encoder_config.train_or_eval_mode}")
         # Create geometry encoder
         self.geometry_encoder = create_geometry_encoder(
             encoder_type=encoder_config.encoder_type,
@@ -1652,57 +1651,274 @@ class Qwen2_5_VLForConditionalGenerationWithVGGT(Qwen2_5_VLPreTrainedModel, Gene
         )
         self.feature_fusion = FeatureFusionModule(fusion_config)
 
-        # Add learnable downsampling module for average pooling
         self.visual_downsample = nn.Sequential(
             nn.LayerNorm(config.hidden_size),
             nn.Linear(config.hidden_size * 2, config.hidden_size),
             nn.GELU()
         )
+    def sinusoidal_encoding(self, coords, hidden_size):
+        """Apply sinusoidal positional encoding to 3D coordinates.
+        Args:
+            coords: shape (n_patches, 3) - x, y, z coordinates
+            dim: embedding dimension for each coordinate
+        """
+        # coords shape: (n_patches, 3)
+        n_patches = coords.shape[0]
+        
+        base_dim = hidden_size // 3
+        remainder = hidden_size % 3
+        dims = [base_dim] * 3
+        for i in range(remainder):
+            dims[i] += 1  # distribute the remainder
+
+        # Generate positional encoding for each coordinate axis.
+        position_encs = []
+        for i in range(3):  # x, y, z
+            dim = dims[i]
+            # Positional encoding for the current axis.
+            pos_enc = torch.zeros(n_patches, dim, device=coords.device, dtype=coords.dtype)
+
+            # Frequency term.
+            position = coords[:, i:i+1]  # (n_patches, 1)
+            div_term = torch.exp(torch.arange(0, dim, 2, device=coords.device).float() * 
+                                -(math.log(10000.0) / dim))
+
+            # Fill sin at even indices.
+            pos_enc[:, 0::2] = torch.sin(position * div_term)
+
+            # Fill cos at odd indices.
+            # If dim is odd, the last slot is sin, so cos has one fewer term.
+            if dim % 2 == 0:
+                # Even dim: same number of sin and cos terms.
+                pos_enc[:, 1::2] = torch.cos(position * div_term)
+            else:
+                # Odd dim: cos has one fewer term than sin.
+                pos_enc[:, 1::2] = torch.cos(position * div_term[:-1])
+            
+            position_encs.append(pos_enc)
+        
+        # Concat: (n_patches, dim_x + dim_y + dim_z) = (n_patches, hidden_size)
+        position_enc = torch.cat(position_encs, dim=-1)
+        return position_enc
+
+    def pointmap_patch_encoder(self, point_map, patch_size=14, hidden_size=3584):
+        """Patch-encode a point map.
+        Args:
+            point_map: shape (n_image, H, W, 3)
+            patch_size: patch size for height and width
+            hidden_size: output embedding dimension
+        Returns:
+            patch_embeddings: shape (n_image, num_patches, hidden_size)
+        """
+        n_image, H, W, _ = point_map.shape
+        ph, pw = patch_size * 2, patch_size * 2
+        # Number of patches.
+        num_patches_h = H // ph
+        num_patches_w = W // pw
+        num_patches = num_patches_h * num_patches_w
+
+        # Unfold into patches.
+        patches = point_map.unfold(1, ph, ph).unfold(2, pw, pw)
+        patches = patches.contiguous().view(n_image, num_patches, ph * pw, 3)
+        # Center coordinate of each patch.
+        patch_centers = patches.mean(dim=2)  # shape: (n_image, num_patches, 3)
+
+        # Sinusoidal encoding of patch centers.
+        position_encodings = self.sinusoidal_encoding(
+            patch_centers.view(-1, 3), hidden_size
+        )  # shape: (n_image * num_patches, 3, hidden_size)
+
+        patch_embeddings = position_encodings.view(n_image, num_patches, hidden_size)
+        return patch_embeddings, patch_centers
+
+
+    def spatial_clustering_cuml(self, voxel_embeds, patch_coords, target_ratio=0.25):
+        """
+        GPU-accelerated clustering of all patches using cuML KMeans.
+
+        Args:
+            voxel_embeds: (total_patches, hidden_size) - all voxel embeddings
+            patch_coords: (total_patches, 3) - 3D coordinates in the world frame
+            target_ratio: target retention ratio (n_clusters / total_patches)
+
+        Returns:
+            clustered_embeds: (num_clusters, hidden_size)
+            clustered_coords: (num_clusters, 3)
+        """
+        
+        total_patches = voxel_embeds.shape[0]
+        num_clusters = int(total_patches * target_ratio)
+
+        # cuML KMeans expects a float32 numpy or cupy array.
+        # Convert to numpy and let cuML push it onto the GPU automatically.
+        coords_np = patch_coords.float().cpu().numpy()
+
+        # cuML KMeans (runs on the GPU).
+        kmeans = cuKMeans(
+            n_clusters=num_clusters,
+            max_iter=100,
+            tol=1e-4,
+            verbose=0,
+            random_state=42,
+            n_init=10
+        )
+
+        # Fit and obtain labels.
+        cluster_labels = kmeans.fit_predict(coords_np)
+        cluster_centers_np = kmeans.cluster_centers_
+
+        # Convert back to PyTorch tensors.
+        cluster_labels = torch.from_numpy(cluster_labels).to(patch_coords.device)
+        cluster_centers = torch.from_numpy(cluster_centers_np).to(patch_coords.device)
+
+        # Aggregate cluster features with the dual-attention mechanism.
+        clustered_embeds = self.dual_attention_aggregation(
+            voxel_embeds, patch_coords, cluster_labels, cluster_centers,
+            alpha=0.5, temperature=1.0
+        )
+        
+        return clustered_embeds, cluster_centers
+
+    def dual_attention_aggregation(self, features, coords, cluster_labels, cluster_centers, 
+                               alpha=0.5, temperature=0.1):
+        """
+        Aggregate cluster features using dual attention over feature similarity and spatial distance.
+
+        Args:
+            features: (N, D) - per-point features
+            coords: (N, 3) - per-point 3D coordinates
+            cluster_labels: (N,) - cluster label of each point
+            cluster_centers: (K, 3) - center coordinate of each cluster
+            alpha: balance between feature similarity and spatial proximity, in [0, 1]
+            temperature: softmax temperature
+
+        Returns:
+            clustered_features: (K, D) - weighted feature of each cluster
+        """
+        num_clusters = cluster_centers.shape[0]
+        feature_dim = features.shape[1]
+        device = features.device
+        
+        clustered_features = torch.zeros(num_clusters, feature_dim, 
+                                        device=device, dtype=features.dtype)
+        
+        for c in range(num_clusters):
+            # All points belonging to cluster c.
+            mask = cluster_labels == c
+            if not mask.any():
+                continue
+                
+            cluster_feats = features[mask]  # (n_points_in_c, D)
+            cluster_coords = coords[mask]   # (n_points_in_c, 3)
+            center = cluster_centers[c:c+1] # (1, 3)
+            n_points = cluster_feats.shape[0]
+
+            # ===== Edge cases: a single point, or all points identical =====
+            if n_points == 1:
+                # Single point: use it directly.
+                clustered_features[c] = cluster_feats[0]
+                continue
+
+            # Check whether every point shares the same coordinates / features.
+            coord_std = cluster_coords.std(dim=0).sum()
+            feat_std = cluster_feats.std(dim=0).sum()
+
+            if coord_std < 1e-6 and feat_std < 1e-6:
+                # All points are identical; the mean equals any single one.
+                clustered_features[c] = cluster_feats.mean(dim=0)
+                continue
+
+            # 1. Feature-similarity weights.
+            # Use the cluster mean feature as the "prototype" feature.
+            proto_feature = cluster_feats.mean(dim=0, keepdim=True)  # (1, D)
+
+            # ===== Numerical-stability guard =====
+            if torch.isnan(proto_feature).any() or torch.isinf(proto_feature).any():
+                proto_feature = torch.nan_to_num(proto_feature, nan=0.0)
+
+            # Cosine similarity.
+            # Add a tiny perturbation to avoid exactly duplicate vectors.
+            feat_sim = F.cosine_similarity(
+                cluster_feats + torch.randn_like(cluster_feats) * 1e-7,  # tiny noise
+                proto_feature, 
+                dim=1
+            )
+            feat_sim = torch.clamp((feat_sim + 1) / 2, min=1e-6, max=1.0)  # avoid zeros
+
+            # 2. Spatial-distance weights.
+            spatial_dist = torch.norm(cluster_coords - center, dim=1)  # (n,)
+
+            # Robust sigma computation.
+            if spatial_dist.std() < 1e-6:
+                # All points are equidistant: fall back to uniform weights.
+                spatial_sim = torch.ones_like(spatial_dist)
+            else:
+                # Convert distance to similarity via an RBF kernel.
+                sigma = torch.clamp(spatial_dist.std(), min=1e-3)  # raise the lower bound
+                exp_term = -spatial_dist**2 / (2 * sigma**2)
+                exp_term = torch.clamp(exp_term, min=-20, max=20)  # clamp to avoid overflow
+                spatial_sim = torch.exp(exp_term)
+                spatial_sim = torch.clamp(spatial_sim, min=1e-6)  # avoid zeros
+
+            # 3. Combine the two weights.
+            combined_weight = alpha * feat_sim + (1 - alpha) * spatial_sim  # (n,)
+
+            # Check whether all weights are identical.
+            weight_std = combined_weight.std()
+            if weight_std < 1e-6:
+                # All weights identical: use a uniform distribution.
+                attention_weights = torch.ones_like(combined_weight) / n_points
+            else:
+                # 4. Softmax normalization.
+                scaled_weight = combined_weight / max(temperature, 1e-3)
+                # Subtract the max for numerical stability.
+                scaled_weight = scaled_weight - scaled_weight.max()
+                scaled_weight = torch.clamp(scaled_weight, min=-20, max=20)
+
+                # Compute softmax.
+                exp_weights = torch.exp(scaled_weight)
+                sum_exp = exp_weights.sum()
+
+                if sum_exp < 1e-10:  # guard against division by zero
+                    attention_weights = torch.ones_like(combined_weight) / n_points
+                else:
+                    attention_weights = exp_weights / sum_exp
+
+            # Sanity-check attention_weights.
+            if torch.isnan(attention_weights).any():
+                attention_weights = torch.ones_like(attention_weights) / len(attention_weights)
+
+            # 5. Weighted aggregation.
+            clustered_features[c] = (cluster_feats * attention_weights.unsqueeze(1)).sum(dim=0)
+        
+        return clustered_features
 
     def _process_geometry_features(self, image_embeds, geometry_encoder_inputs):
         """Process geometry features using the geometry encoder."""
 
         batch_size = len(geometry_encoder_inputs)
-        # print(f"the batch size for geometry encoder inputs: {batch_size}")
         geo_embeds = []
         for bn in range(batch_size):
             if geometry_encoder_inputs[bn].shape[0] > 0:
 
                 n_image, _, height, width = geometry_encoder_inputs[bn].shape
-                # print(f"the input shape to geometry encoder: {geometry_encoder_inputs[bn].shape}")
-                # (n_image, C, H, W) = (n_image, 3, 392, 518)
                 # Encode geometry features
                 features, concat_features = self.geometry_encoder.encode(geometry_encoder_inputs[bn])
                 features = features.to(image_embeds.dtype)
                 concat_features = concat_features.to(image_embeds.dtype)
-                # (n_image, H/14*W/14, feature_dim) = (n_image, 28*37=1036, feature_dim) 
-                # print(f"the shape of geometry features from encoder: {features.shape}")
                 features = features.reshape(n_image, height // self.geometry_encoder.patch_size, width // self.geometry_encoder.patch_size, -1)
-                # print(f"the shape of geometry features before merger: {features.shape}")
-                # (n_image, 28, 37, feature_dim) )
                 # Reshape for merger
                 features = self.geometry_merger(features)
-                # print(f"the shape of geometry features after merger: {features.shape}")
-                # (n_image, 14, 18, hidden_size)
-                # geo_embeds.append(features)
                 concat_features = self.concat_geometry_merger(concat_features)
                 geo_embeds.append(concat_features)
 
         geo_embeds = torch.cat(geo_embeds, dim=0) if geo_embeds else None
-        # print(f"the shape of geometry embeddings: {geo_embeds.shape if geo_embeds is not None else None}")
         if geo_embeds is not None:
             image_embeds = image_embeds.view(geo_embeds.shape[0], -1, geo_embeds.shape[-1])
-            # print(f"the shape of image embeddings before fusion: {image_embeds.shape}")
-
-            # (n_image*14*18, hidden_size)
-            # image_embeds = image_embeds.view(geo_embeds.shape)
             image_embeds = self.feature_fusion(image_embeds, geo_embeds)
-            # (n_image, 14*18, hidden_size)
-            # print(f"the shape of image embeddings after fusion: {image_embeds.shape}")
             
 
             image_embeds = image_embeds.view(-1, image_embeds.shape[-1])
-            # print(f"the shape of image embeddings after fusion and downsampling: {image_embeds.shape}")
         
         return image_embeds
 
@@ -2085,7 +2301,7 @@ class Qwen2_5_VLForConditionalGenerationWithVGGT(Qwen2_5_VLPreTrainedModel, Gene
             shift_logits = logits[..., :-1, :].contiguous()
             shift_labels = labels[..., 1:].contiguous()
             
-            # Get special token IDs
+            # Special token IDs.
             vision_end_token_id = self.config.vision_end_token_id  # <|vision_end|>
             frame_interval_token_id = getattr(self.config, 'frame_interval_token_id', None)  # ","
             frame_end_token_id = getattr(self.config, 'frame_end_token_id', None)  # "\n"
@@ -2094,30 +2310,11 @@ class Qwen2_5_VLForConditionalGenerationWithVGGT(Qwen2_5_VLPreTrainedModel, Gene
             shift_logits = shift_logits.view(-1, self.config.vocab_size)
             shift_labels = shift_labels.view(-1)
             
-            # Get original input_ids (before shifting)
             original_input_ids = input_ids[:, :-1].contiguous().view(-1)
             
-            # ===== Modified loss computation strategy =====
-            # Training data format example:
-            # <img>,<img>,...,<query>,<img>,<img>,...,<img>\n
-            #                         ^^^^^^^^^^^^^^^^^^^^^^^^
-            #                         Multiple images may follow the query
-            # 
-            # Objective: Train the model to learn:
-            # 1. Predict "," after each <vision_end> before the query
-            # 2. For images after the query:
-            #    - Predict "," after <vision_end> for all images except the last one
-            #    - Predict "\n" (stop) after <vision_end> for the last image
-            # 3. Generate language response after "\n"
-            
             if vision_end_token_id is not None and frame_interval_token_id is not None and frame_end_token_id is not None:
-               
-                # 1. Find all vision_end_token positions
                 vision_end_positions = (original_input_ids == vision_end_token_id).nonzero(as_tuple=False).squeeze(-1)
                 
-                
-                # 2. Identify frame decision positions
-                # Frame decision positions: vision_end_token immediately followed by "," or "\n"
                 frame_decision_positions = []
                 stream_loss_mask = torch.zeros_like(shift_labels, dtype=torch.bool)
                 
@@ -2126,7 +2323,7 @@ class Qwen2_5_VLForConditionalGenerationWithVGGT(Qwen2_5_VLPreTrainedModel, Gene
                     if pos_item < len(shift_labels):
                         next_token = shift_labels[pos_item]
                         
-                        # If the next token is "," or "\n", this is a frame decision position
+                        # If the next token is "," or "\n", this position is a frame-decision step.
                         if next_token == frame_interval_token_id or next_token == frame_end_token_id:
                             frame_decision_positions.append(pos_item)
                             stream_loss_mask[pos_item] = True
@@ -2137,40 +2334,25 @@ class Qwen2_5_VLForConditionalGenerationWithVGGT(Qwen2_5_VLPreTrainedModel, Gene
                         else:
                             pass
                 
-                # 3. LLM loss mask: all valid positions excluding frame decisions
-                # This includes:
-                # - All text tokens (query + response)
-                # - But excludes frame decision positions
                 llm_loss_mask = ~stream_loss_mask & (shift_labels != -100)
                 
-                # 4. Compute two types of losses
                 loss_fct = CrossEntropyLoss(reduction='none')
                 all_losses = loss_fct(shift_logits, shift_labels.to(shift_logits.device))
                 
-                # Stream loss (frame decision): train the model to learn when to stop inputting frames
-                # This loss is computed only at "," and "\n" positions
                 stream_loss = all_losses[stream_loss_mask].mean() if stream_loss_mask.any() else torch.tensor(0.0, device=shift_logits.device)
                 
-                # LLM loss (language generation): train the model to generate descriptions
-                # This loss is computed at all non-frame-decision positions
                 llm_loss = all_losses[llm_loss_mask].mean() if llm_loss_mask.any() else torch.tensor(0.0, device=shift_logits.device)
                 
-                # 5. Combine losses
                 stream_loss_weight = getattr(self.config, 'stream_loss_weight', 1.0)
                 llm_loss_weight = getattr(self.config, 'llm_loss_weight', 1.0)
                 
                 loss = stream_loss_weight * stream_loss + llm_loss_weight * llm_loss
                 
-                # 6. Print detailed info during training
                 if self.training:
                     num_continue = (shift_labels[stream_loss_mask] == frame_interval_token_id).sum().item()
                     num_stop = (shift_labels[stream_loss_mask] == frame_end_token_id).sum().item()
                     
-                    
-                    
             else:
-                # If frame decision tokens are not configured, use standard loss
-                
                 loss_fct = CrossEntropyLoss()
                 shift_labels = shift_labels.to(shift_logits.device)
                 loss = loss_fct(shift_logits, shift_labels)

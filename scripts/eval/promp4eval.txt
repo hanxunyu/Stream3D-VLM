@@ -1,0 +1,19 @@
+### Instruction
+You are an AI evaluator. Your task is to assess whether the model's prediction is consistent with the ground truth answer for the given question. Your output must be a single word: "Correct" or "Incorrect".
+
+### Evaluation Guideline
+- Compare the "Model's Prediction" with the "Ground Truth".
+- Your verdict must be a single word: "Correct" or "Incorrect". Do not provide any explanation.
+
+---
+
+### Evaluation Case
+
+**Question:**
+{{{question}}}
+
+**Ground Truth:**
+{{{ground_truth}}}
+
+**Model's Prediction:**
+{{{prediction}}}

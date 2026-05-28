@@ -95,17 +95,14 @@ def preprocess_qwen_2_visual(
             if role == "user":
                 visual_tag = f"<{visual_type}>"
                 if visual_tag in content:
-                    # ===== Corrected processing logic =====
-                    # Split content, but handle the part after the last <image> carefully
+
                     
                     import re
-                    # Do not include "," and "\n" in regex, handle them manually
                     parts = content.split(visual_tag)
                     
                     new_parts = []
                     for i, part in enumerate(parts):
-                        if i > 0:  # All parts except the first are preceded by <image>
-                            # Add vision tokens
+                        if i > 0:
                             replacement = (
                                 "<|vision_start|>"
                                 + f"<|{visual_type}_pad|>" * grid_thw[visual_replicate_index]
@@ -114,60 +111,37 @@ def preprocess_qwen_2_visual(
                             new_parts.append(replacement)
                             visual_replicate_index += 1
                         
-                        # Add the content of this part (may contain ",", "\n", text, etc.)
-                        if part:  # Non-empty
+                        if part:
                             new_parts.append(part)
                     
                     content = "".join(new_parts)
-                    
 
-            # Encode the entire content
             conv = [{"role": role, "content": content}]
             encode_id = tokenizer.apply_chat_template(conv)
             input_id += encode_id
             
             if role in ["user", "system"]:
-                # ===== Key modification: Handle labels =====
-                # Get special token ids
                 comma_token_id = tokenizer.encode(',', add_special_tokens=False)[0]
                 newline_token_id = tokenizer.encode('\n', add_special_tokens=False)[0]
                 vision_end_token_id = tokenizer.convert_tokens_to_ids("<|vision_end|>")
                 
-                # Mask all user inputs by default
                 target_mask = [IGNORE_INDEX] * len(encode_id)
                 
-                # Count the number of vision_end tokens
                 vision_end_count = 0
                 
-                # Iterate to find all "," or "\n" following <vision_end>
                 for k in range(len(encode_id) - 1):
                     if encode_id[k] == vision_end_token_id:
                         vision_end_count += 1
                         next_token = encode_id[k + 1]
-                        # print(f"Vision End found. Next token ID: {next_token}, string: {tokenizer.decode([next_token])}")
-                        # print(f"Expected: {comma_token_id} (,) or {newline_token_id} (\\n)")
                         
-                        # If the next token is "," or "\n"
                         if next_token == comma_token_id or next_token == newline_token_id:
-                            # Keep the label at this position
                             target_mask[k + 1] = next_token
                             
-                            # Debug
-                            # token_name = "," if next_token == comma_token_id else "\\n"
-                            # decision_type = "CONTINUE" if next_token == comma_token_id else "STOP"
-                            # if local_rank == 0:
-                            #     print(f"  [Data] Vision_end #{vision_end_count} at position {k}: next='{token_name}' ({decision_type})")
                         else:
-                            # Debug
-                            # if local_rank == 0:
-                            # print(f"  [Data] Vision_end #{vision_end_count} at position {k}: next token is neither ',' nor '\\n', its id is {next_token}, it is '{tokenizer.decode([next_token])}'")
                             pass
-                
-                # print(f"  [Data] Total vision_end tokens: {vision_end_count}")
                 
                 target += target_mask
             else:
-                # Keep all assistant responses
                 target_mask = encode_id.copy()
                 target_mask[:3] = [IGNORE_INDEX] * 3
                 target += target_mask
@@ -313,9 +287,6 @@ class LazySupervisedDataset(Dataset):
             draw_fn(images[0], info)
         else:
             draw_fn(images, info)
-        # for j, img in enumerate(images):
-        #     # write to local
-        #     img.save(f"images/img_{j}.jpg", format="JPEG")
 
     def process_video(self, video_file):
         if not os.path.exists(video_file):
@@ -371,7 +342,6 @@ class LazySupervisedDataset(Dataset):
         for attempt_idx in range(num_base_retries):
             try:
                 next_index = min(i + 1, len(self.list_data_dict) - 1)
-                # sample_idx = random.choice(range(len(self)))
                 sample = self._get_item(next_index)
                 return sample
             except Exception as e:
@@ -441,11 +411,6 @@ class LazySupervisedDataset(Dataset):
             )
             del sources[0]["video"]
         
-        # # replace <image>\n with <image>
-        # sources[0]["conversations"][0]["value"] = sources[0]["conversations"][0]["value"].replace(
-        #     f"{DEFAULT_IMAGE_TOKEN}\n", DEFAULT_IMAGE_TOKEN
-        # )
-
         # rename images tag
         if "images" in sources[0]:
             sources[0]["image"] = sources[0]["images"]
@@ -658,7 +623,6 @@ class DataCollatorForSupervisedDataset(object):
         batch["video_grid_thw"] = video_grid_thw
         batch["position_ids"] = position_ids
                 
-        # assume all data in a batch has geometry_encoder_inputs
         if "geometry_encoder_inputs" in instances[0]:
             geometry_encoder_inputs = [torch.stack(instance["geometry_encoder_inputs"]) for instance in instances]
             batch["geometry_encoder_inputs"] = geometry_encoder_inputs
@@ -749,7 +713,6 @@ class FlattenedDataCollatorForSupervisedDataset(DataCollatorForSupervisedDataset
         batch["video_grid_thw"] = video_grid_thw
 
                 
-        # assume all data in a batch has geometry_encoder_inputs
         if "geometry_encoder_inputs" in instances[0]:
             raise NotImplementedError("FlattenedDataCollatorForSupervisedDataset does not support geometry_encoder_inputs")
 

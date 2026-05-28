@@ -354,16 +354,8 @@ class Concat_GeometryFeatureMerger(nn.Module):
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass through the merger."""
-
-        # n_image, h_patch, w_patch, dim = x.shape
-        # x = x[:, :h_patch // self.merge_size * self.merge_size, :w_patch // self.merge_size*self.merge_size , :]
-        # print(f"the shape of x after cropping in GeometryFeatureMerger: {x.shape}")
-        # x = x.reshape(n_image, h_patch // self.merge_size, self.merge_size, w_patch // self.merge_size, self.merge_size, dim)
-        # x = x.permute(0, 1, 3, 2, 4, 5).contiguous()
-        # print(f"the shape of x after permute in GeometryFeatureMerger: {x.shape}")
         if self.merger_type == "mlp":
             x = self.mlp(self.ln_q(x))
-            # print(f"the shape of x after mlp in Concat_GeometryFeatureMerger: {x.shape}")
         elif self.merger_type == "avg":
             # Average pooling across spatial merge dimensions
             x = x.mean(dim=(3, 4))  # Average over the merge_size dimensions
@@ -371,5 +363,4 @@ class Concat_GeometryFeatureMerger(nn.Module):
             x = self.mlp(x)
         else:
             raise NotImplementedError(f"Merger type {self.merger_type} not implemented")
-        # x = x.reshape(n_image, h_patch // self.merge_size, w_patch // self.merge_size, -1)
         return x
