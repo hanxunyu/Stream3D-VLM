@@ -123,8 +123,6 @@ We use [StreamVGGT](https://github.com/wzzheng/StreamVGGT) to generate point clo
 #### Setup
 
 ```bash
-cd visualization
-git clone https://github.com/wzzheng/StreamVGGT.git
 
 # For GLB output:
 pip install roma trimesh scipy matplotlib
