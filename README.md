@@ -113,6 +113,51 @@ bash scripts/train/train_stream3d-vlm.sh
 
 ## 🎥 Visualization
 
+### 🌐 Incremental 3D Reconstruction
+
+We use [StreamVGGT](https://github.com/wzzheng/StreamVGGT) to generate point clouds that visualize the streaming 3D perception process. Two output formats are supported:
+
+- **GLB** — incremental step-by-step point clouds viewable in any 3D viewer
+- **RRD** — [Rerun](https://rerun.io/) recording with camera poses and point clouds
+
+#### Setup
+
+```bash
+cd visualization
+git clone https://github.com/wzzheng/StreamVGGT.git
+
+# For GLB output:
+pip install roma trimesh scipy matplotlib
+
+# For RRD output:
+pip install roma rerun-sdk
+
+# Checkpoint will be auto-downloaded from HuggingFace on first run,
+# or specify a local path via --ckpt.
+```
+
+#### Usage
+
+**GLB (incremental point clouds):**
+```bash
+bash visualization/run_incremental_reconstruction.sh
+```
+
+**RRD (Rerun recording):**
+```bash
+bash visualization/run_incremental_reconstruction_rrd.sh
+```
+
+Edit the scripts to configure input/output paths and parameters (e.g., `INPUT_DIR`, `CKPT_PATH`, `STEP`).
+
+#### Output
+
+- **GLB**: `incremental_steps/step_XXXX.glb` (each incremental step) and `scene_final_conf{thres}.glb` (final full reconstruction)
+- **RRD**: `scene_final_conf{thres}.rrd` (final reconstruction with camera poses and point clouds), viewable via:
+  ```bash
+  rerun output/scene_final_conf50.0.rrd
+  ```
+
 ### 🕘 Demo 1-Backward Tracing (Memory)
 
 https://github.com/user-attachments/assets/2b479d23-cfba-4e4e-a226-e2d94b024731
@@ -128,12 +173,9 @@ https://github.com/user-attachments/assets/eceea976-8004-4db2-b977-7dee083e8aca
 https://github.com/user-attachments/assets/c1f2083f-cc4a-4ef7-ab09-72edfa351f65
 
 
-
-
-
 ## 👏 Acknowledgements
 We are grateful for the open-source contributions of other projects:
-- [StreamVGGT](https://github.com/wzzheng/streamvggt)
+- [StreamVGGT](https://github.com/wzzheng/StreamVGGT)
 - [VG-LLM](https://github.com/LaVi-Lab/VG-LLM)
 - [VLM-3R](https://github.com/VITA-Group/VLM-3R)
 
