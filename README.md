@@ -123,7 +123,6 @@ We use [StreamVGGT](https://github.com/wzzheng/StreamVGGT) to generate point clo
 #### Setup
 
 ```bash
-
 # For GLB output:
 pip install roma trimesh scipy matplotlib
 
