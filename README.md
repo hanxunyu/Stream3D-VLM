@@ -1,9 +1,3 @@
-<!-- <h1 align="center" style="display: flex; align-items: flex-start; justify-content: center; gap: 12px;">
-  <strong>
-    Stream3D-VLM: Online 3D Spatial Understanding<br>
-    with Incremental Geometry Priors
-  </strong>
-</h1> -->
 <h1 align="center">
   <img src="assets/logo.png" height="48" alt="Stream3D-VLM Logo" align="absmiddle">
   &nbsp;Stream3D-VLM: Online 3D Spatial Understanding with Incremental Geometry Priors
@@ -70,9 +64,8 @@ conda create -n stream3d-llm python=3.10 -y
 conda activate stream3d-llm
 pip install -r requirements.txt
 pip install flash-attn==2.7.4.post1 --no-build-isolation
-export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 ```
-## 📊 Dataset and Benchmark
+## 📊 Datasets and Benchmark
 <div align="left">
 <img src="assets/data_generation.png" width="99%" alt="data_generation">
 </div>
@@ -84,42 +77,56 @@ export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 ## 📦️ Pretrained Models
 We provide the pretrained model [Stream3D-VLM-4B](https://huggingface.co/JonnyYu828/Stream3D-VLM-4B) in Hugging Face 🤗. 
 
-## 🤖 Inference Examples 
-Try our example inference script. 
+## 🤖 Inference Examples
+Run our example inference script:
+```bash
+bash scripts/eval/eval_examples.sh
 ```
-# inference 
-bash src/qwen_vl/eval/model_inference.sh
-```
-Specify `--data_path` as [Stream3D-Bench](https://huggingface.co/datasets/JonnyYu828/Stream3D-Bench) and `--image_root` as the directory containing the source datasets, then run the evaluation on Stream3D-Bench.
-```
-# 获得NA和MCA指标：
 
-# 获得OEA指标：
+To evaluate on [Stream3D-Bench](https://huggingface.co/datasets/JonnyYu828/Stream3D-Bench), set `--data_path` to the benchmark annotation file and `--image_root` to the directory containing the source media, then run:
+```bash
+bash scripts/eval/eval_bench.sh
+```
 
+After inference, set `input_file` in the corresponding metric script to the generated result file and compute the metrics:
+```bash
+# NA and MCA metrics
+python scripts/comput_metrics/compute_score-NA+MCA.py
+
+# OEA metric
+# Set `api_key` and `base_url` before running.
+python scripts/comput_metrics/compute_score-OEA.py
+
+# Answer-Timing Accuracy (ATA)
+python scripts/comput_metrics/compute_answer-timing-accuracy.py
+
+# Response latency (TTFT and end-to-end latency)
+python scripts/comput_metrics/compute_response-latency.py
 ```
 
 ## 🚀 Training
 
-Specify the DATASETS, then run the following training script.
+Configure the datasets in `src/qwen_vl/data/__init__.py`, set `DATASETS` in the training script, and run:
+```bash
+bash scripts/train/train_stream3d-vlm.sh
 ```
-bash scripts/train/train_stream3d-8b.sh
-```
 
-### Demo 1-Forward Response (Monitoring)
+## 🎥 Visualization
+
+### 🕘 Demo 1-Backward Tracing (Memory)
+
+https://github.com/user-attachments/assets/2b479d23-cfba-4e4e-a226-e2d94b024731
 
 
-https://github.com/user-attachments/assets/c1f2083f-cc4a-4ef7-ab09-72edfa351f65
-
-
-### Demo 2-Realtime Perception (Observation)
-
+### 👁️ Demo 2-Realtime Perception (Observation)
 
 https://github.com/user-attachments/assets/eceea976-8004-4db2-b977-7dee083e8aca
 
 
-### Demo 3-Backward Tracing (Memory)
+### ⏩ Demo 3-Forward Response (Monitoring)
 
-https://github.com/user-attachments/assets/2b479d23-cfba-4e4e-a226-e2d94b024731
+https://github.com/user-attachments/assets/c1f2083f-cc4a-4ef7-ab09-72edfa351f65
+
 
 
 
