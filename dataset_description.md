@@ -211,9 +211,9 @@ Stream3D-Bench employs task-specific evaluation metrics:
 
 Additionally, we introduce a new metric **$\textit{Answer-Timing Accuracy}$ $(ATA)$** to measure temporal response precision in streaming tasks:
 
-$$S(t_{\text{pred}}) = \mathbb{1}(t_{\text{pred}} \geq t_{\text{gt}}) \cdot \exp\left(-\beta \cdot (t_{\text{pred}} - t_{\text{gt}})\right)$$
+$$S(t_{\mathrm{pred}}) = \mathbb{I}(t_{\mathrm{pred}} \geq t_{\mathrm{gt}}) \cdot \exp\left(-\beta (t_{\mathrm{pred}} - t_{\mathrm{gt}})\right)$$
 
-where $t_{\text{pred}}$ is the predicted response time, $t_{\text{gt}}$ is the earliest answerable ground-truth timestamp, and $\beta = 0.5$ is the delay penalty factor. The $ATA$ metric is computed by averaging the timing score over all samples.
+where $t_{\mathrm{pred}}$ is the predicted response time, $t_{\mathrm{gt}}$ is the earliest answerable ground-truth timestamp, and $\beta = 0.5$ is the delay penalty factor. The $ATA$ metric is computed by averaging the timing score over all samples.
 
 ---
 
