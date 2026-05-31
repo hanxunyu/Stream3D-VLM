@@ -59,6 +59,7 @@ https://github.com/user-attachments/assets/41888813-b040-4305-9188-ceb010ad84d1
 ```
 git clone https://github.com/hanxunyu/Stream3D-VLM.git
 cd Stream3D-VLM
+export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 
 conda create -n stream3d-llm python=3.10 -y
 conda activate stream3d-llm
