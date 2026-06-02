@@ -104,7 +104,7 @@ python scripts/comput_metrics/compute_answer-timing-accuracy.py
 # Response latency (TTFT and end-to-end latency)
 python scripts/comput_metrics/compute_response-latency.py
 ```
-> *Due to further refinements and updates to the dataset and benchmark, the model’s actual performance may differ slightly from the results reported in the paper.*
+<!-- > *Due to further refinements and updates to the dataset and benchmark, the model’s actual performance may differ slightly from the results reported in the paper.* -->
 ## 🚀 Training
 
 Configure the datasets in `src/qwen_vl/data/__init__.py`, set `DATASETS` in the training script, and run:
