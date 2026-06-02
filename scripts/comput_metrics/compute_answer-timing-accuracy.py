@@ -130,5 +130,6 @@ def evaluate_predictions(predictions_file: str, alpha: float = 2.0) -> None:
     print("="*60)
 
 if __name__ == "__main__":
-    input_file = ""
-    evaluate_predictions(input_file)
+    input_file = "output_logs/Stream3D-VLM-4B/evaluate_results.json"
+    alpha = 0.5
+    evaluate_predictions(predictions_file=input_file, alpha=alpha)
