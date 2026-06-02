@@ -21,7 +21,7 @@ TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 
 
 python -m torch.distributed.run --nproc_per_node=$NPROC_PER_NODE --master_addr=$MASTER_ADDR --master_port=$MASTER_PORT \
-    scripts/evaluation/evaluate.py \
+    scripts/eval/evaluate.py \
     --model_path  JonnyYu828/Stream3D-VLM-4B \
     --data_path  ./benchmark/stream3d_bench.json  \
     --image_root ./datasets/ \
