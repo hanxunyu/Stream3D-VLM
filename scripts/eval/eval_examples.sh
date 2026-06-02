@@ -20,10 +20,9 @@ print(find_free_port())
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 
 
-
 python -m torch.distributed.run --nproc_per_node=$NPROC_PER_NODE --master_addr=$MASTER_ADDR --master_port=$MASTER_PORT \
     scripts/eval/evaluate.py \
     --model_path  JonnyYu828/Stream3D-VLM-4B \
-    --data_path  ./examples/stream3d_examples.json  \
-    --image_root ./examples/images \
-    --output_path ./output_logs/Stream3D-VLM-4B/evaluate_results${TIMESTAMP}.json
+    --data_path  ./examples/stream3d_bench_examples.json  \
+    --image_root  ./examples/videos \
+    --output_path ./examples/stream3d_bench_examples_results${TIMESTAMP}.json
