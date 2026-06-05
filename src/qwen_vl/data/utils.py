@@ -159,21 +159,13 @@ def prepare_image_inputs(image, image_processor):
     merge_size: int = getattr(image_processor, "merge_size")
     patch_size: int = getattr(image_processor, "patch_size")
     _, height, width = images[0].shape
-    # width:518, height:392
     if width % (patch_size * merge_size) > 0:
         width = width - (width % (patch_size * merge_size))
-        # 504
     if height % (patch_size * merge_size) > 0:
         height = height - (height % (patch_size * merge_size))
-        # 392
 
     images = images[:,:, :height, :width]
     visual_processed = image_processor(images, return_tensors="pt", do_rescale=False)
-    image_tensor = visual_processed["pixel_values"] # (bs=1, C=3, H, W) [1008, 1176]
-    grid_thw = visual_processed["image_grid_thw"] # ((T, H, W)) shape: [1,3]
-
-    return {
-        "pixel_values": image_tensor,
-        "image_grid_thw": grid_thw[0], # (T, H, W) 
-        "geometry_encoder_inputs": geometry_encoder_inputs
-    }
+    image_tensor = visual_processed["pixel_values"] 
+    grid_thw = visual_processed["image_grid_thw"]
+    return {"pixel_values": image_tensor, "image_grid_thw": grid_thw[0], "geometry_encoder_inputs": geometry_encoder_inputs}
