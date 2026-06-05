@@ -158,17 +158,15 @@ Edit the scripts to configure input/output paths and parameters (e.g., `INPUT_DI
 
 ### 🕘 Demo 1-Backward Tracing (Memory)
 
-https://github.com/user-attachments/assets/2b479d23-cfba-4e4e-a226-e2d94b024731
-
+https://github.com/user-attachments/assets/dadc7fd2-58f6-420d-ab13-592be3821d64
 
 ### 👁️ Demo 2-Realtime Perception (Observation)
 
-https://github.com/user-attachments/assets/eceea976-8004-4db2-b977-7dee083e8aca
-
+https://github.com/user-attachments/assets/57ac71fc-6c3f-4d24-86a2-4d9847f95039
 
 ### ⏩ Demo 3-Forward Response (Monitoring)
 
-https://github.com/user-attachments/assets/c1f2083f-cc4a-4ef7-ab09-72edfa351f65
+https://github.com/user-attachments/assets/715b8136-84a1-4c5d-b653-771d5162337b
 
 
 ## 👏 Acknowledgements
