@@ -48,10 +48,10 @@ https://github.com/user-attachments/assets/41888813-b040-4305-9188-ceb010ad84d1
 
 ## 📰 News
 
-- [2026-03-27] 🔥 We release [Stream3D-1M Dataset](https://huggingface.co/datasets/JonnyYu828/Stream3D-1M-Dataset) and [Stream3D-Bench](https://huggingface.co/datasets/JonnyYu828/Stream3D-Bench) in Hugging Face 🤗.
-- [2026-03-27] 🔥 We release the checkpoint of [Stream3D-VLM-4B](https://huggingface.co/JonnyYu828/Stream3D-VLM-4B) in Hugging Face 🤗.
-- [2026-03-27] 🔥 We release the training and inference code.
-- [2026-03-27] 🔥 We release the [paper](https://arxiv.org/abs/2606.06891) of Stream3D-VLM.
+- [2026-06-08] 🔥 We release [Stream3D-1M Dataset](https://huggingface.co/datasets/JonnyYu828/Stream3D-1M-Dataset) and [Stream3D-Bench](https://huggingface.co/datasets/JonnyYu828/Stream3D-Bench) in Hugging Face 🤗.
+- [2026-06-08] 🔥 We release the checkpoint of [Stream3D-VLM-4B](https://huggingface.co/JonnyYu828/Stream3D-VLM-4B) in Hugging Face 🤗.
+- [2026-06-08] 🔥 We release the training and inference code.
+- [2026-06-05] 🔥 We release the [paper](https://arxiv.org/abs/2606.06891) of Stream3D-VLM.
 
 
 ## 🛠️ Installation
