@@ -19,7 +19,7 @@
 </p>
 
 <div align="center">
-    <a href='xxxxx' target="_blank"><img src='https://img.shields.io/badge/arXiv-XXXX-b31b1b?logo=arxiv&logoColor=red'></a>  
+    <a href='https://arxiv.org/abs/2606.06891' target="_blank"><img src='https://img.shields.io/badge/arXiv-2606.06891-b31b1b?logo=arxiv&logoColor=red'></a>  
     <a href='https://stream3d-vlm.github.io/' target="_blank"><img src='https://img.shields.io/badge/Project-Home%20Page-Green?logo=safari&logoColor=white'></a>  
     <a href='https://huggingface.co/JonnyYu828/Stream3D-VLM-4B' target="_blank">
         <img src='https://img.shields.io/badge/%F0%9F%93%A6%EF%B8%8F%20Hugging%20Face-Model-orange'>
@@ -51,7 +51,7 @@ https://github.com/user-attachments/assets/41888813-b040-4305-9188-ceb010ad84d1
 - [2026-03-27] 🔥 We release [Stream3D-1M Dataset](https://huggingface.co/datasets/JonnyYu828/Stream3D-1M-Dataset) and [Stream3D-Bench](https://huggingface.co/datasets/JonnyYu828/Stream3D-Bench) in Hugging Face 🤗.
 - [2026-03-27] 🔥 We release the checkpoint of [Stream3D-VLM-4B](https://huggingface.co/JonnyYu828/Stream3D-VLM-4B) in Hugging Face 🤗.
 - [2026-03-27] 🔥 We release the training and inference code.
-- [2026-03-27] 🔥 We release the [paper](xxxxx) of Stream3D-VLM.
+- [2026-03-27] 🔥 We release the [paper](https://arxiv.org/abs/2606.06891) of Stream3D-VLM.
 
 
 ## 🛠️ Installation
@@ -184,5 +184,10 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 ## 🖊️ Citation
 
 ```BibTeX
-
+@article{yu2026stream3d,
+    title={Stream3D-VLM: Online 3D Spatial Understanding with Incremental Geometry Priors},
+    author={Hanxun Yu and Xuan Qu and Lei Ke and Boqiang Zhang and Yuxin Wang and Jianke Zhu and Dong Yu},
+    journal={arXiv preprint arXiv:2606.06891},
+    year={2026}
+}
 ```
